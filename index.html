@@ -195,6 +195,14 @@ footer{text-align:center;font-size:12px;color:#8A97AE;padding:20px}
     <span><span class="dot" style="background:var(--grape)"></span>介音（3個）</span>
     <span><span class="dot" style="background:var(--teal)"></span>韻母（13個）</span>
   </div>
+  <div class="card" style="background:linear-gradient(135deg,#FFF3D6,#DFF7F4);padding:12px;margin-bottom:14px">
+    <div style="font-size:14px;line-height:1.7">🎧 <b>想聽真人標準發音？</b>翰林出版有官方發音網站，可以一邊用我們的網站練習互動，一邊聽真人示範：</div>
+    <div class="mrow" style="margin-top:8px">
+      <button class="btn o" onclick="openHanlin('b')">🎧 聲符（21個）</button>
+      <button class="btn t" onclick="openHanlin('y')">🎧 韻符（16個）</button>
+      <button class="btn g" onclick="openHanlin('joined')">🎧 結合韻（22個）</button>
+    </div>
+  </div>
   <div class="grid" id="symGrid"></div>
 </section>
 
@@ -227,6 +235,7 @@ footer{text-align:center;font-size:12px;color:#8A97AE;padding:20px}
   <h2 class="sec">🌈 結合韻快速練習（22 個，點了就唸）</h2>
   <div class="card">
     <div id="jBanner"><div class="hintTxt">點下面任何一個結合韻，先聽聲音，再看它的發音小故事 👇</div></div>
+    <div class="mrow" style="margin-top:8px"><button class="btn g" onclick="openHanlin('joined')">🎧 聽翰林結合韻真人發音</button></div>
     <div class="jgrid" id="jGrid"></div>
   </div>
 </section>
@@ -284,6 +293,7 @@ footer{text-align:center;font-size:12px;color:#8A97AE;padding:20px}
     <div class="mrow">
       <button class="btn o" id="mSay">🔊 聽符號發音</button>
       <button class="btn t" id="mSayWord">🔊 聽例詞</button>
+      <button class="btn g" id="mHanlin">🎬 翰林真人影片</button>
     </div>
     <div class="mn">
       <div class="pic" id="mPic">👨</div>
@@ -320,6 +330,19 @@ footer{text-align:center;font-size:12px;color:#8A97AE;padding:20px}
   </div>
 </div>
 
+<!-- 翰林發音影片彈窗 -->
+<div class="modal" id="vModal">
+  <div class="mbox" style="max-width:640px;background:#0E1626;color:#fff">
+    <button class="mclose" id="vClose" style="color:#fff">✕</button>
+    <div style="font-family:var(--kai);font-size:54px;text-align:center;line-height:1.1;margin:4px 0 8px" id="vTitle">ㄅ</div>
+    <div style="text-align:center;font-size:13px;color:#9DB2D0;margin-bottom:8px">🎧 翰林出版・注音符號發音網</div>
+    <video id="vPlayer" controls playsinline preload="metadata" style="width:100%;border-radius:14px;background:#000;display:block;max-height:60vh"></video>
+    <div style="text-align:center;font-size:12px;color:#7B8FAE;margin-top:10px;line-height:1.6">
+      影片版權屬翰林出版事業股份有限公司所有<br>本網站僅作教學示範連結使用
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 <footer>ㄅㄆㄇ注音樂園 · 百宏文教機構教學專用 · 建議使用 Chrome / Safari，開啟聲音效果最佳 🔊</footer>
 
@@ -353,20 +376,42 @@ function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t
 
 /* 符號發音：z=直接唸注音符號（多數zh-TW引擎支援呼讀音），c=用國字示範 */
 
-/* 每個注音符號的最佳呼讀音來源（一律一聲）
-   - 有合適一聲漢字：直接用漢字（最可靠）
-   - 無合適一聲漢字：用注音拼寫，沒加聲調＝一聲 */
+/* 每個注音符號的最佳呼讀音來源（一律使用真實漢字，盡量取一聲） */
 const PRON={
-'ㄅ':'撥','ㄆ':'坡','ㄇ':'摸','ㄈ':'ㄈㄛ',
-'ㄉ':'ㄉㄜ','ㄊ':'ㄊㄜ','ㄋ':'ㄋㄜ','ㄌ':'ㄌㄜ',
-'ㄍ':'哥','ㄎ':'科','ㄏ':'喝',
-'ㄐ':'機','ㄑ':'七','ㄒ':'西',
-'ㄓ':'之','ㄔ':'吃','ㄕ':'詩','ㄖ':'ㄖ',
-'ㄗ':'資','ㄘ':'疵','ㄙ':'思',
+/* 聲母 21 個 */
+'ㄅ':'撥',     /* bō 一聲，呼讀音=ㄅㄛ ✓ */
+'ㄆ':'坡',     /* pō 一聲，呼讀音=ㄆㄛ ✓ */
+'ㄇ':'摸',     /* mō 一聲，呼讀音=ㄇㄛ ✓ */
+'ㄈ':'夫',     /* fū 一聲，呼讀音ㄈㄛ無一聲字，改用 ㄈㄨ */
+'ㄉ':'答',     /* dā 一聲，呼讀音ㄉㄜ無一聲字，改用 ㄉㄚ */
+'ㄊ':'他',     /* tā 一聲，呼讀音ㄊㄜ無一聲字，改用 ㄊㄚ */
+'ㄋ':'拿',     /* ná 二聲，n-開頭無常見一聲字（妞太罕見），妥協 */
+'ㄌ':'拉',     /* lā 一聲，呼讀音ㄌㄜ無一聲字，改用 ㄌㄚ */
+'ㄍ':'哥',     /* gē 一聲 ✓ */
+'ㄎ':'科',     /* kē 一聲 ✓ */
+'ㄏ':'喝',     /* hē 一聲 ✓ */
+'ㄐ':'機',     /* jī 一聲 ✓ */
+'ㄑ':'七',     /* qī 一聲 ✓ */
+'ㄒ':'西',     /* xī 一聲 ✓ */
+'ㄓ':'之',     /* zhī 一聲 ✓ */
+'ㄔ':'吃',     /* chī 一聲 ✓ */
+'ㄕ':'詩',     /* shī 一聲 ✓ */
+'ㄖ':'扔',     /* rēng 一聲，r-開頭少見一聲，扔為首選 */
+'ㄗ':'資',     /* zī 一聲 ✓ */
+'ㄘ':'疵',     /* cī 一聲 ✓ */
+'ㄙ':'思',     /* sī 一聲 ✓ */
+/* 介音 3 個 */
 'ㄧ':'衣','ㄨ':'屋','ㄩ':'迂',
-'ㄚ':'啊','ㄛ':'喔','ㄜ':'婀','ㄝ':'ㄝ',
+/* 韻母 13 個 */
+'ㄚ':'啊',     /* ā ✓ */
+'ㄛ':'喔',     /* ō ✓ */
+'ㄜ':'婀',     /* ē 一聲（罕見字，現代 TTS 多能唸；不行時退回 鵝） */
+'ㄝ':'耶',     /* yē 一聲 ✓ */
 'ㄞ':'哀','ㄟ':'欸','ㄠ':'凹','ㄡ':'歐',
-'ㄢ':'安','ㄣ':'恩','ㄤ':'骯','ㄥ':'ㄥ','ㄦ':'ㄦ'};
+'ㄢ':'安','ㄣ':'恩','ㄤ':'骯',
+'ㄥ':'鞥',     /* ēng 一聲（罕見字；無更好選擇） */
+'ㄦ':'兒'      /* ér 二聲——無一聲 er 字，妥協 */
+};
 
 function speakSym(o){
   if(!('speechSynthesis' in window)){toast('這個瀏覽器不支援語音 😢');return;}
@@ -384,11 +429,11 @@ const SYMS=[
  {s:'ㄅ',cat:'b',say:'撥',word:'爸爸',wz:'ㄅㄚˋ ˙ㄅㄚ',pic:'👨',hint:'嘴巴閉緊再彈開，輕輕的「ㄅ」'},
  {s:'ㄆ',cat:'b',say:'坡',word:'蘋果',wz:'ㄆㄧㄥˊ ㄍㄨㄛˇ',pic:'🍎',hint:'像ㄅ但是用力吐氣，手放嘴前會有風'},
  {s:'ㄇ',cat:'b',say:'摸',word:'貓咪',wz:'ㄇㄠ ㄇㄧ',pic:'🐱',hint:'嘴巴閉著，鼻子出聲「ㄇ～」'},
- {s:'ㄈ',cat:'b',say:'ㄈㄛ',word:'飛機',wz:'ㄈㄟ ㄐㄧ',pic:'✈️',hint:'上排牙齒輕咬下嘴唇吹氣'},
- {s:'ㄉ',cat:'b',say:'ㄉㄜ',word:'蛋糕',wz:'ㄉㄢˋ ㄍㄠ',pic:'🎂',hint:'舌尖頂上排牙齒後面，輕輕彈開'},
- {s:'ㄊ',cat:'b',say:'ㄊㄜ',word:'兔子',wz:'ㄊㄨˋ ˙ㄗ',pic:'🐰',hint:'像ㄉ但是用力吐氣'},
- {s:'ㄋ',cat:'b',say:'ㄋㄜ',word:'牛奶',wz:'ㄋㄧㄡˊ ㄋㄞˇ',pic:'🥛',hint:'舌尖頂住，從鼻子出聲'},
- {s:'ㄌ',cat:'b',say:'ㄌㄜ',word:'老虎',wz:'ㄌㄠˇ ㄏㄨˇ',pic:'🐯',hint:'舌尖頂住再放開，聲音從舌頭兩邊出來'},
+ {s:'ㄈ',cat:'b',say:'夫',word:'飛機',wz:'ㄈㄟ ㄐㄧ',pic:'✈️',hint:'上排牙齒輕咬下嘴唇吹氣'},
+ {s:'ㄉ',cat:'b',say:'答',word:'蛋糕',wz:'ㄉㄢˋ ㄍㄠ',pic:'🎂',hint:'舌尖頂上排牙齒後面，輕輕彈開'},
+ {s:'ㄊ',cat:'b',say:'他',word:'兔子',wz:'ㄊㄨˋ ˙ㄗ',pic:'🐰',hint:'像ㄉ但是用力吐氣'},
+ {s:'ㄋ',cat:'b',say:'拿',word:'牛奶',wz:'ㄋㄧㄡˊ ㄋㄞˇ',pic:'🥛',hint:'舌尖頂住，從鼻子出聲'},
+ {s:'ㄌ',cat:'b',say:'拉',word:'老虎',wz:'ㄌㄠˇ ㄏㄨˇ',pic:'🐯',hint:'舌尖頂住再放開，聲音從舌頭兩邊出來'},
  {s:'ㄍ',cat:'b',say:'哥',word:'狗狗',wz:'ㄍㄡˇ ㄍㄡˇ',pic:'🐶',hint:'舌頭後面頂住，輕輕的「ㄍ」'},
  {s:'ㄎ',cat:'b',say:'科',word:'可樂',wz:'ㄎㄜˇ ㄌㄜˋ',pic:'🥤',hint:'像ㄍ但是用力吐氣'},
  {s:'ㄏ',cat:'b',say:'喝',word:'花朵',wz:'ㄏㄨㄚ ㄉㄨㄛˇ',pic:'🌸',hint:'喉嚨輕輕吹氣「ㄏ～」像哈氣'},
@@ -398,7 +443,7 @@ const SYMS=[
  {s:'ㄓ',cat:'b',say:'知',word:'蜘蛛',wz:'ㄓ ㄓㄨ',pic:'🕷️',hint:'舌頭翹起來頂上顎（翹舌音）'},
  {s:'ㄔ',cat:'b',say:'吃',word:'吃飯',wz:'ㄔ ㄈㄢˋ',pic:'🍚',hint:'像ㄓ但是用力吐氣（翹舌音）'},
  {s:'ㄕ',cat:'b',say:'詩',word:'獅子',wz:'ㄕ ˙ㄗ',pic:'🦁',hint:'舌頭翹起來，輕輕吹氣「ㄕ～」'},
- {s:'ㄖ',cat:'b',say:'ㄖ',word:'太陽（日）',wz:'ㄖˋ',pic:'☀️',hint:'舌頭翹起來，聲帶振動「ㄖ～」'},
+ {s:'ㄖ',cat:'b',say:'扔',word:'太陽（日）',wz:'ㄖˋ',pic:'☀️',hint:'舌頭翹起來，聲帶振動「ㄖ～」'},
  {s:'ㄗ',cat:'b',say:'資',word:'紫色',wz:'ㄗˇ ㄙㄜˋ',pic:'💜',hint:'舌尖平平的頂牙齒（平舌音）'},
  {s:'ㄘ',cat:'b',say:'疵',word:'刺蝟',wz:'ㄘˋ ㄨㄟˋ',pic:'🦔',hint:'像ㄗ但是用力吐氣（平舌音）'},
  {s:'ㄙ',cat:'b',say:'思',word:'松鼠',wz:'ㄙㄨㄥ ㄕㄨˇ',pic:'🐿️',hint:'舌尖平平的，輕輕吹氣「ㄙ～」像蛇'},
@@ -416,8 +461,8 @@ const SYMS=[
  {s:'ㄢ',cat:'y',say:'安',word:'安全帽',wz:'ㄢ ㄑㄩㄢˊ ㄇㄠˋ',pic:'⛑️',hint:'ㄚ的後面加上ㄋ的尾巴：「ㄢ」'},
  {s:'ㄣ',cat:'y',say:'恩',word:'按門鈴「嗯」',wz:'ㄣ',pic:'🔔',hint:'ㄜ的後面加上ㄋ的尾巴：「ㄣ」'},
  {s:'ㄤ',cat:'y',say:'骯',word:'昂首挺胸',wz:'ㄤˊ ㄕㄡˇ',pic:'💪',hint:'嘴巴張開，鼻音長長的：「ㄤ～」'},
- {s:'ㄥ',cat:'y',say:'ㄥ',word:'燈（ㄉ＋ㄥ）',wz:'ㄉㄥ',pic:'🏮',hint:'嘴巴半開，鼻音長長的：「ㄥ～」'},
- {s:'ㄦ',cat:'y',say:'ㄦ',word:'耳朵',wz:'ㄦˇ ˙ㄉㄨㄛ',pic:'👂',hint:'說ㄜ的時候舌頭往上捲：「ㄦ」'}
+ {s:'ㄥ',cat:'y',say:'鞥',word:'燈（ㄉ＋ㄥ）',wz:'ㄉㄥ',pic:'🏮',hint:'嘴巴半開，鼻音長長的：「ㄥ～」'},
+ {s:'ㄦ',cat:'y',say:'兒',word:'耳朵',wz:'ㄦˇ ˙ㄉㄨㄛ',pic:'👂',hint:'說ㄜ的時候舌頭往上捲：「ㄦ」'}
 ];
 
 /* ============ 音節字典（聲調1~5，- 表示沒有常用字）============ */
@@ -476,6 +521,47 @@ const D={
 const TONES=[{n:1,mk:'',lbl:'一聲',sym:'—'},{n:2,mk:'ˊ',lbl:'二聲',sym:'ˊ'},{n:3,mk:'ˇ',lbl:'三聲',sym:'ˇ'},{n:4,mk:'ˋ',lbl:'四聲',sym:'ˋ'},{n:5,mk:'˙',lbl:'輕聲',sym:'˙'}];
 function tonedZ(syl,t){return t===5?('˙'+syl):(syl+TONES[t-1].mk);}
 function lookup(syl,t){const e=D[syl];if(!e)return null;const c=e[t-1];return (c&&c!=='-')?c:null;}
+
+
+/* ============ 翰林真人發音影片整合 ============ */
+const HANLIN_BASE='https://h5.hle.com.tw/h5mp4/E_All_1/10preschool/kidsvideo1/';
+const HANLIN_ROOT='注音符號發音';
+const HANLIN_SHENG='ㄅㄆㄇㄈㄉㄊㄋㄌㄍㄎㄏㄐㄑㄒㄓㄔㄕㄖㄗㄘㄙ';
+const HANLIN_YUN='ㄧㄨㄩㄚㄛㄜㄝㄞㄟㄠㄡㄢㄣㄤㄥㄦ';
+function hanlinVideoUrl(sym){
+  if(!sym) return null;
+  let folder;
+  if(sym.length===1 && HANLIN_SHENG.indexOf(sym)>=0) folder='01聲符';
+  else if(sym.length===1 && HANLIN_YUN.indexOf(sym)>=0) folder='02韻符';
+  else if(sym.length>=2) folder='03結合韻';
+  else return null;
+  return HANLIN_BASE
+    +encodeURIComponent(HANLIN_ROOT)+'/'
+    +encodeURIComponent(folder)+'/'
+    +encodeURIComponent(sym)+'.mp4';
+}
+function hanlinUrl(catOrJoined){
+  if(catOrJoined==='b') return 'https://kidsvideo1.hle.com.tw/1/';
+  if(catOrJoined==='j'||catOrJoined==='y') return 'https://kidsvideo1.hle.com.tw/2/';
+  if(catOrJoined==='joined') return 'https://kidsvideo1.hle.com.tw/3/';
+  return 'https://kidsvideo1.hle.com.tw/';
+}
+function openHanlin(catOrJoined){
+  window.open(hanlinUrl(catOrJoined),'_blank','noopener');
+  toast('已開啟翰林發音網 🎧');
+}
+function playHanlin(sym){
+  const url=hanlinVideoUrl(sym);
+  if(!url){toast('找不到對應影片');return;}
+  speechSynthesis&&speechSynthesis.cancel();
+  const m=document.getElementById('vModal');
+  const v=document.getElementById('vPlayer');
+  document.getElementById('vTitle').textContent=sym;
+  v.src=url;
+  v.load();
+  m.classList.add('on');
+  v.play().catch(()=>{/* 自動播放被擋，使用者按播放鍵即可 */});
+}
 
 /* ============ 分頁切換 ============ */
 
@@ -555,7 +641,8 @@ function openModal(i){
 document.getElementById('mclose').onclick=()=>modal.classList.remove('on');
 modal.onclick=e=>{if(e.target===modal)modal.classList.remove('on');};
 document.getElementById('mSay').onclick=()=>speakSym(SYMS[curIdx]);
-document.getElementById('mSayWord').onclick=()=>speak(SYMS[curIdx].word.replace(/（.*）/,''),0.75);
+document.getElementById('mHanlin').onclick=()=>playHanlin(SYMS[curIdx].s);
+document.getElementById('mSayWord').onclick=()=>speak(SYMS[curIdx].word.replace(/[（）「」]/g,''),0.75);
 document.getElementById('mPrev').onclick=()=>openModal((curIdx+SYMS.length-1)%SYMS.length);
 document.getElementById('mNext').onclick=()=>openModal((curIdx+1)%SYMS.length);
 
@@ -709,8 +796,13 @@ function buildJGrid(container,banner,list){
     d.onclick=()=>{
       speakJoined(j);
       if(banner&&info){
-        banner.innerHTML=jStoryHTML(j)+'<div class="mrow"><button class="btn t" id="jSayStory">🔊 唸故事給我聽</button></div>';
-        banner.querySelector('#jSayStory').onclick=()=>speak(info[2].replace(/[「」～！？。：、]/g,'，'),0.85);
+        banner.innerHTML=jStoryHTML(j)+
+          '<div class="mrow">'+
+          '<button class="btn t" data-act="story">🔊 唸故事給我聽</button>'+
+          '<button class="btn g" data-act="hanlin">🎬 翰林真人影片</button>'+
+          '</div>';
+        banner.querySelector('[data-act="story"]').onclick=()=>speak(info[2].replace(/[「」～！？。：、]/g,'，'),0.85);
+        banner.querySelector('[data-act="hanlin"]').onclick=()=>playHanlin(j);
       }
     };
     container.appendChild(d);
@@ -845,7 +937,7 @@ function g2start(){
           setTimeout(()=>{
             a.b.classList.add('done');d.b.classList.add('done');
             a.b.classList.remove('open');d.b.classList.remove('open');
-            speak(a.c.o.word.replace(/（.*）/,''),0.75);
+            speak(a.c.o.word.replace(/[（）「」]/g,''),0.75);
             g2open=[];g2lock=false;g2done++;
             if(g2done===6){toast('全部配對成功！🏆');speak('太棒了，全部配對成功');}
           },450);
@@ -878,8 +970,8 @@ function g3newRound(){
   const initialsOnly=SYMS.filter(o=>o.cat==='b');
   g3target=initialsOnly[Math.floor(Math.random()*initialsOnly.length)];
   document.getElementById('g3emoji').textContent=g3target.pic;
-  document.getElementById('g3word').textContent=g3target.word.replace(/（.*）/,'')+'，開頭是哪個注音？';
-  speak(g3target.word.replace(/（.*）/,''),0.75);
+  document.getElementById('g3word').textContent=g3target.word.replace(/[（）「」]/g,'')+'，開頭是哪個注音？';
+  speak(g3target.word.replace(/[（）「」]/g,''),0.75);
   const sea=document.getElementById('g3sea');sea.innerHTML='';
   const opts=[g3target];
   while(opts.length<6){
@@ -901,14 +993,14 @@ function g3newRound(){
         setTimeout(g3newRound,800);
       }else{
         toast('不是這顆，再聽一次！');
-        speak(g3target.word.replace(/（.*）/,''),0.75);
+        speak(g3target.word.replace(/[（）「」]/g,''),0.75);
       }
     };
     sea.appendChild(b);
   });
 }
 document.getElementById('g3start').onclick=()=>{g3score=0;g3roundN=0;document.getElementById('g3score').textContent=0;g3newRound();};
-document.getElementById('g3play').onclick=()=>{if(g3target)speak(g3target.word.replace(/（.*）/,''),0.75);else toast('先按「開始遊戲」！');};
+document.getElementById('g3play').onclick=()=>{if(g3target)speak(g3target.word.replace(/[（）「」]/g,''),0.75);else toast('先按「開始遊戲」！');};
 
 /* ============ 37 個符號的發音故事 ============ */
 const STORY={
@@ -1078,7 +1170,7 @@ function renderStep(){
     const o=SYMS[st.i];
     body.innerHTML='<div class="stepTag">✏️ 符號教學（'+(st.k+1)+'/'+st.n+'）</div>'+
       '<div class="bigz">'+o.s+'</div>'+
-      '<div class="mrow"><button class="btn o" id="sSay">🔊 聽符號發音</button><button class="btn t" id="sWord">🔊 例詞「'+o.word+'」</button></div>'+
+      '<div class="mrow"><button class="btn o" id="sSay">🔊 聽符號發音</button><button class="btn t" id="sWord">🔊 例詞「'+o.word+'」</button><button class="btn g" id="sHanlin">🎬 翰林影片</button></div>'+
       '<div class="storyBox"><div class="pic">'+o.pic+'</div><div><b>發音故事：</b>'+STORY[o.s]+
       '<div style="font-size:13px;color:#8A97AE;margin-top:6px">💡 '+o.hint+'</div></div></div>'+
       '<div class="mrow"><button class="btn g" id="sStory">🔊 唸故事給我聽</button></div>'+
@@ -1086,8 +1178,9 @@ function renderStep(){
       '<canvas class="trace" id="sTrace" width="300" height="300"></canvas>'+
       '<div class="mrow"><button class="btn w" id="sClear">🧽 擦掉重寫</button></div>';
     body.querySelector('#sSay').onclick=()=>speakSym(o);
-    body.querySelector('#sWord').onclick=()=>speak(o.word.replace(/（.*）/,''),0.7);
+    body.querySelector('#sWord').onclick=()=>speak(o.word.replace(/[（）「」]/g,''),0.7);
     body.querySelector('#sStory').onclick=()=>speak(STORY[o.s].replace(/[「」～！？。：、——]/g,'，'),0.85);
+    body.querySelector('#sHanlin').onclick=()=>playHanlin(o.s);
     const reset=makeTrace(body.querySelector('#sTrace'),o.s);
     body.querySelector('#sClear').onclick=reset;
     setTimeout(()=>speakSym(o),250);
@@ -1109,6 +1202,7 @@ function renderStep(){
     body.innerHTML='<div class="stepTag">🌈 結合韻</div>'+
       '<div class="card"><div style="font-size:15px;line-height:1.8">'+st.title+'</div>'+
       '<div id="ljBanner"><div class="hintTxt">點一個結合韻，先聽聲音，再聽它的小故事 👇</div></div>'+
+      '<div class="mrow" style="margin-top:8px"><button class="btn g" onclick="openHanlin(\'joined\')">🎧 聽翰林結合韻真人發音</button></div>'+
       '<div class="jgrid" id="ljGrid" style="margin-top:10px"></div></div>';
     buildJGrid(body.querySelector('#ljGrid'),body.querySelector('#ljBanner'),st.list||JOINED);
   }
@@ -1134,6 +1228,17 @@ function renderStep(){
     body.querySelector('#cheer').onclick=()=>speak('恭喜你完成七堂課，你是注音小達人，太棒了！',0.85);
   }
 }
+
+
+/* 翰林影片彈窗關閉 */
+(function(){
+  const m=document.getElementById('vModal');
+  const v=document.getElementById('vPlayer');
+  function closeV(){v.pause();v.removeAttribute('src');v.load();m.classList.remove('on');}
+  document.getElementById('vClose').onclick=closeV;
+  m.addEventListener('click',e=>{if(e.target===m)closeV();});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&m.classList.contains('on'))closeV();});
+})();
 
 </script>
 </body>
