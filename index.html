@@ -167,6 +167,10 @@ footer{text-align:center;font-size:12px;color:#8A97AE;padding:20px}
     <span><span class="dot" style="background:var(--orange)"></span>聲母（21個）</span>
     <span><span class="dot" style="background:var(--grape)"></span>介音（3個）</span>
     <span><span class="dot" style="background:var(--teal)"></span>韻母（13個）</span>
+    <span style="margin-left:auto">🔊 符號發音：
+      <button class="btn t" id="pmZ" style="font-size:13px;padding:5px 10px">注音直唸</button>
+      <button class="btn w" id="pmC" style="font-size:13px;padding:5px 10px">國字示範</button>
+    </span>
   </div>
   <div class="grid" id="symGrid"></div>
 </section>
@@ -297,10 +301,27 @@ function speak(text,rate){
 }
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');clearTimeout(t._tm);t._tm=setTimeout(()=>t.classList.remove('on'),1600);}
 
+/* 符號發音：z=直接唸注音符號（多數zh-TW引擎支援呼讀音），c=用國字示範 */
+let pronMode='z';
+function speakSym(o){
+  if(!('speechSynthesis' in window)){toast('這個瀏覽器不支援語音 😢');return;}
+  if(pronMode==='c'){speak(o.say,0.7);return;}
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(o.s);
+  u.lang='zh-TW'; if(voiceTW)u.voice=voiceTW;
+  u.rate=0.55; u.pitch=1.1;
+  let t0=0;
+  u.onstart=()=>{t0=performance.now();};
+  u.onend=()=>{ // 引擎不認得注音字元時通常瞬間結束 → 自動改用國字示範
+    if(t0&&performance.now()-t0<180)speak(o.say,0.7);
+  };
+  speechSynthesis.speak(u);
+}
+
 /* ============ 符號資料 ============ */
 // cat: b=聲母 j=介音 y=韻母；say=發音用字；word=例詞；wz=例詞注音；pic=圖像；hint=發音小提示
 const SYMS=[
- {s:'ㄅ',cat:'b',say:'玻',word:'爸爸',wz:'ㄅㄚˋ ˙ㄅㄚ',pic:'👨',hint:'嘴巴閉緊再彈開，輕輕的「ㄅ」'},
+ {s:'ㄅ',cat:'b',say:'撥',word:'爸爸',wz:'ㄅㄚˋ ˙ㄅㄚ',pic:'👨',hint:'嘴巴閉緊再彈開，輕輕的「ㄅ」'},
  {s:'ㄆ',cat:'b',say:'坡',word:'蘋果',wz:'ㄆㄧㄥˊ ㄍㄨㄛˇ',pic:'🍎',hint:'像ㄅ但是用力吐氣，手放嘴前會有風'},
  {s:'ㄇ',cat:'b',say:'摸',word:'貓咪',wz:'ㄇㄠ ㄇㄧ',pic:'🐱',hint:'嘴巴閉著，鼻子出聲「ㄇ～」'},
  {s:'ㄈ',cat:'b',say:'佛',word:'飛機',wz:'ㄈㄟ ㄐㄧ',pic:'✈️',hint:'上排牙齒輕咬下嘴唇吹氣'},
@@ -326,7 +347,7 @@ const SYMS=[
  {s:'ㄩ',cat:'j',say:'迂',word:'下雨',wz:'ㄒㄧㄚˋ ㄩˇ',pic:'☔',hint:'先說ㄧ，嘴巴再嘟圓，就是「ㄩ」'},
  {s:'ㄚ',cat:'y',say:'啊',word:'張大嘴「啊」',wz:'ㄚ',pic:'😮',hint:'嘴巴張大大，「ㄚ～」看醫生的聲音'},
  {s:'ㄛ',cat:'y',say:'喔',word:'公雞喔喔叫',wz:'ㄛ ㄛ',pic:'🐓',hint:'嘴巴圓圓的，「ㄛ～」'},
- {s:'ㄜ',cat:'y',say:'婀',word:'鵝',wz:'ㄜˊ',pic:'🦢',hint:'嘴巴半開不圓，「ㄜ～」'},
+ {s:'ㄜ',cat:'y',say:'鵝',word:'鵝',wz:'ㄜˊ',pic:'🦢',hint:'嘴巴半開不圓，「ㄜ～」'},
  {s:'ㄝ',cat:'y',say:'耶',word:'耶！好棒',wz:'ㄧㄝˊ',pic:'🙌',hint:'微笑著說「ㄝ」，常和ㄧㄩ做朋友'},
  {s:'ㄞ',cat:'y',say:'哀',word:'哎呀',wz:'ㄞ ㄧㄚ',pic:'😯',hint:'ㄚ＋ㄧ很快連在一起：「ㄞ」'},
  {s:'ㄟ',cat:'y',say:'欸',word:'ㄟ～打招呼',wz:'ㄟ',pic:'👋',hint:'ㄝ＋ㄧ很快連在一起：「ㄟ」'},
@@ -397,6 +418,16 @@ function tonedZ(syl,t){return t===5?('˙'+syl):(syl+TONES[t-1].mk);}
 function lookup(syl,t){const e=D[syl];if(!e)return null;const c=e[t-1];return (c&&c!=='-')?c:null;}
 
 /* ============ 分頁切換 ============ */
+const pmZ=document.getElementById('pmZ'),pmC=document.getElementById('pmC');
+function setPM(m){
+  pronMode=m;
+  pmZ.className='btn '+(m==='z'?'t':'w');pmZ.style.cssText='font-size:13px;padding:5px 10px';
+  pmC.className='btn '+(m==='c'?'t':'w');pmC.style.cssText='font-size:13px;padding:5px 10px';
+  toast(m==='z'?'改用注音直唸 🔊':'改用國字示範 🔊');
+}
+pmZ.onclick=()=>setPM('z');
+pmC.onclick=()=>setPM('c');
+
 document.querySelectorAll('.tab').forEach(b=>{
   b.onclick=()=>{
     document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
@@ -462,11 +493,11 @@ function openModal(i){
   document.getElementById('mHint').textContent='💡 '+o.hint;
   modal.classList.add('on');
   resetTrace();
-  speak(o.say);
+  speakSym(o);
 }
 document.getElementById('mclose').onclick=()=>modal.classList.remove('on');
 modal.onclick=e=>{if(e.target===modal)modal.classList.remove('on');};
-document.getElementById('mSay').onclick=()=>speak(SYMS[curIdx].say);
+document.getElementById('mSay').onclick=()=>speakSym(SYMS[curIdx]);
 document.getElementById('mSayWord').onclick=()=>speak(SYMS[curIdx].word.replace(/（.*）/,''),0.75);
 document.getElementById('mPrev').onclick=()=>openModal((curIdx+SYMS.length-1)%SYMS.length);
 document.getElementById('mNext').onclick=()=>openModal((curIdx+1)%SYMS.length);
@@ -514,7 +545,7 @@ function buildPicker(id,items,setter){
   box.appendChild(none);
   items.forEach(s=>{
     const b=document.createElement('button');b.className='pk';b.textContent=s;
-    b.onclick=()=>{setter(s);renderTrain();box.classList.remove('on');speak(SYMS.find(o=>o.s===s).say);};
+    b.onclick=()=>{setter(s);renderTrain();box.classList.remove('on');speakSym(SYMS.find(o=>o.s===s));};
     box.appendChild(b);
   });
 }
@@ -678,17 +709,17 @@ function g1round(){
         setTimeout(g1round,900);
       }else{
         b.classList.add('bad');g1streak=0;
-        toast('再聽一次，加油！');speak(g1ans.say);
+        toast('再聽一次，加油！');speakSym(g1ans);
       }
       document.getElementById('g1score').textContent=g1score;
       document.getElementById('g1streak').textContent=g1streak;
     };
     box.appendChild(b);
   });
-  setTimeout(()=>speak(correct.say),300);
+  setTimeout(()=>speakSym(correct),300);
 }
 document.getElementById('g1start').onclick=()=>{g1score=0;g1streak=0;document.getElementById('g1score').textContent=0;document.getElementById('g1streak').textContent=0;g1round();};
-document.getElementById('g1play').onclick=()=>{if(g1ans)speak(g1ans.say);else toast('先按「開始遊戲」！');};
+document.getElementById('g1play').onclick=()=>{if(g1ans)speakSym(g1ans);else toast('先按「開始遊戲」！');};
 
 /* 遊戲2：配對翻翻樂 */
 let g2open=[],g2lock=false,g2moves=0,g2done=0;
