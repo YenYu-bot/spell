@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ㄅㄆㄇ注音樂園｜百宏文教機構</title>
+<style>
+:root{
+  --sky:#E8F4FD; --ink:#2B3A55; --orange:#FF8A3D; --orange-d:#E76F1F;
+  --teal:#2EC4B6; --teal-d:#1FA396; --grape:#7B5EA7; --pink:#FF6B8A;
+  --yellow:#FFD23F; --card:#FFFFFF; --line:#D6E6F2;
+  --kai:"DFKai-SB","BiauKai","KaiTi","TW-Kai","Noto Serif TC",serif;
+  --body:"Noto Sans TC","Microsoft JhengHei","PingFang TC",sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:var(--body);background:var(--sky);color:var(--ink);min-height:100vh;
+  background-image:radial-gradient(circle at 12% 8%, #FFF3D6 0 90px, transparent 91px),
+  radial-gradient(circle at 88% 18%, #DFF7F4 0 70px, transparent 71px),
+  radial-gradient(circle at 80% 85%, #FBE3EA 0 110px, transparent 111px);}
+header{padding:18px 16px 6px;text-align:center}
+.logo{font-size:30px;font-weight:900;letter-spacing:2px}
+.logo .b{color:var(--orange)} .logo .p{color:var(--teal)} .logo .m{color:var(--grape)}
+.sub{font-size:13px;color:#6B7A99;margin-top:4px}
+nav{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:14px 10px;position:sticky;top:0;z-index:50;background:linear-gradient(var(--sky) 75%,transparent)}
+.tab{border:none;cursor:pointer;font-family:var(--body);font-weight:800;font-size:16px;
+  padding:10px 16px;border-radius:999px;background:#fff;color:var(--ink);
+  box-shadow:0 3px 0 var(--line);transition:transform .08s}
+.tab:active{transform:translateY(2px);box-shadow:none}
+.tab.on{background:var(--orange);color:#fff;box-shadow:0 3px 0 var(--orange-d)}
+main{max-width:980px;margin:0 auto;padding:8px 14px 70px}
+.page{display:none}.page.on{display:block;animation:pop .25s ease}
+@keyframes pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+h2.sec{font-size:22px;margin:14px 4px 10px;display:flex;align-items:center;gap:8px}
+.card{background:var(--card);border-radius:22px;padding:16px;box-shadow:0 4px 0 var(--line);margin-bottom:14px}
+.btn{border:none;cursor:pointer;font-family:var(--body);font-weight:800;font-size:16px;border-radius:14px;padding:10px 16px;transition:transform .08s;color:#fff}
+.btn:active{transform:scale(.95)}
+.btn.o{background:var(--orange);box-shadow:0 3px 0 var(--orange-d)}
+.btn.t{background:var(--teal);box-shadow:0 3px 0 var(--teal-d)}
+.btn.g{background:var(--grape);box-shadow:0 3px 0 #5d4584}
+.btn.p{background:var(--pink);box-shadow:0 3px 0 #d94e6d}
+.btn.w{background:#fff;color:var(--ink);box-shadow:0 3px 0 var(--line)}
+/* 課程表 */
+.lesson{border-left:10px solid var(--teal);}
+.lesson h3{font-size:19px;margin-bottom:6px}
+.lesson .tag{display:inline-block;background:var(--yellow);border-radius:8px;padding:2px 8px;font-size:13px;font-weight:800;margin:2px 4px 2px 0}
+.flow{margin-top:8px;display:grid;gap:6px}
+.flow div{background:#F4FAFF;border-radius:10px;padding:7px 10px;font-size:14px;display:flex;gap:8px}
+.flow b{color:var(--orange);white-space:nowrap}
+/* 符號頁 */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(86px,1fr));gap:10px}
+.sym{background:#fff;border-radius:18px;padding:10px 4px;text-align:center;cursor:pointer;
+  box-shadow:0 4px 0 var(--line);transition:transform .1s;border:3px solid transparent}
+.sym:hover{transform:translateY(-3px)}
+.sym .z{font-family:var(--kai);font-size:40px;font-weight:700;line-height:1.1}
+.sym .e{font-size:20px}.sym .w{font-size:12px;color:#6B7A99}
+.cat-b .z{color:var(--orange)} .cat-j .z{color:var(--grape)} .cat-y .z{color:var(--teal)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:14px;margin:6px 4px 12px}
+.dot{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:4px}
+/* 詳細視窗 */
+.modal{position:fixed;inset:0;background:rgba(43,58,85,.45);display:none;z-index:100;align-items:center;justify-content:center;padding:14px}
+.modal.on{display:flex}
+.mbox{background:#FFFDF6;border-radius:26px;max-width:560px;width:100%;max-height:92vh;overflow:auto;padding:20px;position:relative}
+.mclose{position:absolute;top:10px;right:12px;font-size:26px;border:none;background:none;cursor:pointer;color:#999}
+.bigz{font-family:var(--kai);font-size:110px;text-align:center;line-height:1.05;color:var(--ink)}
+.mn{display:flex;align-items:center;gap:14px;background:#FFF3D6;border-radius:16px;padding:12px;margin:10px 0}
+.mn .pic{font-size:46px}
+.mrow{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:8px 0}
+canvas.trace{background:#fff;border:3px dashed var(--teal);border-radius:18px;touch-action:none;display:block;margin:8px auto;max-width:100%}
+.hintTxt{font-size:14px;color:#6B7A99;text-align:center}
+/* 拼音火車 */
+.train{display:flex;align-items:flex-end;justify-content:center;gap:6px;flex-wrap:wrap;margin:10px 0}
+.carCol{text-align:center}
+.carLbl{font-size:13px;font-weight:800;color:#6B7A99;margin-bottom:4px}
+.car{width:104px;height:112px;border-radius:18px 18px 8px 8px;display:flex;align-items:center;justify-content:center;
+  font-family:var(--kai);font-size:54px;font-weight:700;color:#fff;position:relative;cursor:pointer;user-select:none}
+.car::after{content:"";position:absolute;bottom:-12px;left:14px;width:20px;height:20px;border-radius:50%;background:#46546e;box-shadow:46px 0 0 #46546e}
+.car.head{background:var(--orange);border-radius:26px 14px 8px 8px}
+.car.mid{background:var(--grape)}
+.car.tail{background:var(--teal)}
+.car.empty{background:#cfd9e6;font-size:18px;font-family:var(--body)}
+.toneRow{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:18px 0 6px}
+.toneBtn{width:58px;height:58px;border-radius:50%;border:none;font-size:24px;font-weight:900;cursor:pointer;background:#fff;box-shadow:0 3px 0 var(--line);font-family:var(--kai)}
+.toneBtn.on{background:var(--yellow);box-shadow:0 3px 0 #d9ab12}
+.result{background:#fff;border-radius:22px;padding:14px;text-align:center;box-shadow:0 4px 0 var(--line)}
+.resZ{font-family:var(--kai);font-size:64px;min-height:80px;line-height:1.2}
+.resC{font-size:18px;color:#6B7A99;min-height:26px}
+.picker{display:none;flex-wrap:wrap;gap:6px;justify-content:center;background:#F4FAFF;border-radius:16px;padding:10px;margin-top:10px}
+.picker.on{display:flex}
+.pk{border:none;background:#fff;border-radius:12px;font-family:var(--kai);font-size:26px;width:52px;height:52px;cursor:pointer;box-shadow:0 2px 0 var(--line)}
+.pk:hover{background:var(--yellow)}
+.jgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(74px,1fr));gap:8px}
+.jcell{background:#fff;border-radius:14px;text-align:center;padding:8px 2px;font-family:var(--kai);font-size:26px;cursor:pointer;box-shadow:0 3px 0 var(--line)}
+.jcell:hover{background:var(--yellow)}
+/* 課文 */
+.poemTitle{font-size:20px;font-weight:900;color:var(--grape);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.pline{display:flex;flex-wrap:wrap;gap:4px;margin:10px 0}
+.syl{display:flex;flex-direction:column;align-items:center;background:#FFFBEF;border-radius:10px;padding:5px 6px;cursor:pointer;min-width:46px;transition:transform .08s}
+.syl:hover{background:var(--yellow);transform:translateY(-2px)}
+.syl .zy{font-family:var(--kai);font-size:15px;color:var(--teal-d);font-weight:700;letter-spacing:1px}
+.syl .hz{font-family:var(--kai);font-size:30px;line-height:1.15}
+.syl.lit{background:var(--yellow)}
+/* 遊戲 */
+.gWrap{text-align:center}
+.score{display:inline-block;background:#fff;border-radius:999px;padding:6px 16px;font-weight:900;box-shadow:0 3px 0 var(--line);margin:4px}
+.opts{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:14px 0}
+.opt{width:86px;height:86px;border-radius:20px;border:none;background:#fff;font-family:var(--kai);font-size:44px;cursor:pointer;box-shadow:0 4px 0 var(--line);transition:transform .1s}
+.opt:hover{transform:translateY(-3px)}
+.opt.good{background:#C9F2D0;box-shadow:0 4px 0 #6CC58A}
+.opt.bad{background:#FFD6DE;box-shadow:0 4px 0 #F08CA0}
+.memGrid{display:grid;grid-template-columns:repeat(4,minmax(64px,86px));gap:10px;justify-content:center;margin:12px 0}
+.mem{aspect-ratio:1;border-radius:16px;border:none;cursor:pointer;font-size:34px;font-family:var(--kai);
+  background:var(--grape);color:#fff;box-shadow:0 4px 0 #5d4584;transition:transform .15s}
+.mem.open{background:#fff;color:var(--ink);box-shadow:0 4px 0 var(--line)}
+.mem.done{background:var(--yellow);box-shadow:0 4px 0 #d9ab12;cursor:default}
+.sea{position:relative;height:330px;background:linear-gradient(#DFF2FF,#BBE3FF);border-radius:20px;overflow:hidden;margin-top:10px}
+.bal{position:absolute;width:72px;height:88px;border-radius:50% 50% 48% 48%;display:flex;align-items:center;justify-content:center;
+  font-family:var(--kai);font-size:36px;color:#fff;cursor:pointer;border:none;animation:float 3.2s ease-in-out infinite}
+.bal::after{content:"";position:absolute;bottom:-22px;width:2px;height:22px;background:rgba(0,0,0,.25)}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+.target{font-size:20px;font-weight:900;margin:8px 0}
+.big-emoji{font-size:60px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;
+  padding:10px 20px;border-radius:999px;font-weight:800;opacity:0;transition:opacity .25s;z-index:200;pointer-events:none}
+.toast.on{opacity:1}
+.note{font-size:13px;color:#8A97AE;margin-top:8px}
+.subTabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+footer{text-align:center;font-size:12px;color:#8A97AE;padding:20px}
+@media (max-width:520px){
+  .car{width:84px;height:96px;font-size:44px}
+  .bigz{font-size:88px}
+  .opt{width:72px;height:72px;font-size:36px}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo"><span class="b">ㄅ</span><span class="p">ㄆ</span><span class="m">ㄇ</span> 注音樂園</div>
+  <div class="sub">百宏文教機構 BHCS ｜ 七堂課，輕鬆學會所有注音符號 🎈</div>
+</header>
+
+<nav>
+  <button class="tab on" data-pg="plan">📅 七堂課</button>
+  <button class="tab" data-pg="learn">✏️ 學注音</button>
+  <button class="tab" data-pg="spell">🚂 拼拼看</button>
+  <button class="tab" data-pg="poem">📖 唸課文</button>
+  <button class="tab" data-pg="game">🎮 玩遊戲</button>
+</nav>
+
+<main>
+<!-- ================= 課程表 ================= -->
+<section id="pg-plan" class="page on">
+  <h2 class="sec">📅 七堂課學習地圖（每堂 90 分鐘）</h2>
+  <div id="planList"></div>
+  <div class="card" style="background:#FFF3D6">
+    <b>👩‍🏫 給老師的小叮嚀：</b>
+    <div style="font-size:14px;margin-top:6px;line-height:1.8">
+      每堂課建議節奏：暖身唱跳 → 新符號教學（圖像＋發音＋描寫）→ 拼讀火車 → 課文或遊戲 → 複習小考。
+      孩子注意力約 15–20 分鐘一個段落，記得穿插站起來的活動。每堂課最後 10 分鐘用「玩遊戲」頁面驗收，孩子最買單！
+    </div>
+  </div>
+</section>
+
+<!-- ================= 學注音 ================= -->
+<section id="pg-learn" class="page">
+  <h2 class="sec">✏️ 認識 37 個注音符號（點一點，聽發音、學寫法）</h2>
+  <div class="legend">
+    <span><span class="dot" style="background:var(--orange)"></span>聲母（21個）</span>
+    <span><span class="dot" style="background:var(--grape)"></span>介音（3個）</span>
+    <span><span class="dot" style="background:var(--teal)"></span>韻母（13個）</span>
+  </div>
+  <div class="grid" id="symGrid"></div>
+</section>
+
+<!-- ================= 拼拼看 ================= -->
+<section id="pg-spell" class="page">
+  <h2 class="sec">🚂 拼音小火車（兩拼、三拼、聲調練習）</h2>
+  <div class="card">
+    <div class="hintTxt">點火車車廂選符號：車頭＝聲母、中間＝介音（ㄧㄨㄩ）、車尾＝韻母，再選聲調，按「出發」聽聽看！</div>
+    <div class="train">
+      <div class="carCol"><div class="carLbl">聲母</div><button class="car head empty" id="carI">點我選</button></div>
+      <div class="carCol"><div class="carLbl">介音</div><button class="car mid empty" id="carM">點我選</button></div>
+      <div class="carCol"><div class="carLbl">韻母</div><button class="car tail empty" id="carF">點我選</button></div>
+    </div>
+    <div class="picker" id="pickI"></div>
+    <div class="picker" id="pickM"></div>
+    <div class="picker" id="pickF"></div>
+    <div class="toneRow" id="toneRow"></div>
+    <div class="mrow">
+      <button class="btn o" id="goTrain">🚂 出發！唸出來</button>
+      <button class="btn t" id="randTrain">🎲 隨機拼一個</button>
+      <button class="btn w" id="clearTrain">清空</button>
+    </div>
+    <div class="result">
+      <div class="resZ" id="resZ">—</div>
+      <div class="resC" id="resC">選好符號，火車就出發囉！</div>
+    </div>
+    <div class="note">💡 小提醒：不是每種組合都有國字喔！如果出現「找不到」，換個聲調或符號再試試。</div>
+  </div>
+
+  <h2 class="sec">🌈 結合韻快速練習（22 個，點了就唸）</h2>
+  <div class="card">
+    <div class="jgrid" id="jGrid"></div>
+  </div>
+</section>
+
+<!-- ================= 課文 ================= -->
+<section id="pg-poem" class="page">
+  <h2 class="sec">📖 童趣課文（點一個字聽一個字，也可以整句唸）</h2>
+  <div id="poemList"></div>
+</section>
+
+<!-- ================= 遊戲 ================= -->
+<section id="pg-game" class="page">
+  <h2 class="sec">🎮 互動小遊戲</h2>
+  <div class="subTabs">
+    <button class="btn t" data-g="g1">👂 聽音找符號</button>
+    <button class="btn g" data-g="g2">🃏 配對翻翻樂</button>
+    <button class="btn p" data-g="g3">🎈 氣球大作戰</button>
+  </div>
+
+  <div class="card gWrap" id="g1" style="display:none">
+    <h3>👂 聽音找符號</h3>
+    <p style="margin:6px 0;font-size:14px;color:#6B7A99">聽聽看是哪個注音符號的聲音，從四個選項中找出來！</p>
+    <span class="score">得分：<span id="g1score">0</span></span>
+    <span class="score">連對：<span id="g1streak">0</span> 🔥</span>
+    <div class="mrow"><button class="btn o" id="g1play">🔊 再聽一次</button></div>
+    <div class="opts" id="g1opts"></div>
+    <button class="btn t" id="g1start">開始遊戲</button>
+  </div>
+
+  <div class="card gWrap" id="g2" style="display:none">
+    <h3>🃏 配對翻翻樂</h3>
+    <p style="margin:6px 0;font-size:14px;color:#6B7A99">把注音符號和它的圖案好朋友配成對！（例如 ㄇ ↔ 🐱貓）</p>
+    <span class="score">步數：<span id="g2moves">0</span></span>
+    <div class="memGrid" id="g2grid"></div>
+    <button class="btn g" id="g2start">重新洗牌</button>
+  </div>
+
+  <div class="card gWrap" id="g3" style="display:none">
+    <h3>🎈 氣球大作戰</h3>
+    <p style="margin:6px 0;font-size:14px;color:#6B7A99">看圖聽單字，戳破「開頭注音」的氣球！共 10 題。</p>
+    <span class="score">得分：<span id="g3score">0</span></span>
+    <span class="score">第 <span id="g3round">0</span> / 10 題</span>
+    <div class="target"><span class="big-emoji" id="g3emoji">🎈</span><div id="g3word" style="font-size:22px"></div></div>
+    <div class="mrow"><button class="btn o" id="g3play">🔊 再聽一次</button><button class="btn p" id="g3start">開始遊戲</button></div>
+    <div class="sea" id="g3sea"></div>
+  </div>
+</section>
+</main>
+
+<!-- 符號詳細視窗 -->
+<div class="modal" id="modal">
+  <div class="mbox">
+    <button class="mclose" id="mclose">✕</button>
+    <div class="bigz" id="mZ">ㄅ</div>
+    <div class="mrow">
+      <button class="btn o" id="mSay">🔊 聽符號發音</button>
+      <button class="btn t" id="mSayWord">🔊 聽例詞</button>
+    </div>
+    <div class="mn">
+      <div class="pic" id="mPic">👨</div>
+      <div>
+        <div style="font-weight:900;font-size:17px" id="mWord">爸爸</div>
+        <div style="font-family:var(--kai);color:var(--teal-d);font-weight:700" id="mWordZ"></div>
+        <div style="font-size:14px;color:#6B7A99;margin-top:4px" id="mHint"></div>
+      </div>
+    </div>
+    <div style="text-align:center;font-weight:900;margin-top:6px">✍️ 描描看（沿著淡淡的字描一描）</div>
+    <canvas class="trace" id="trace" width="320" height="320"></canvas>
+    <div class="mrow">
+      <button class="btn w" id="traceClear">🧽 擦掉重寫</button>
+      <button class="btn g" id="mPrev">⬅ 上一個</button>
+      <button class="btn g" id="mNext">下一個 ➡</button>
+    </div>
+    <div class="hintTxt">寫字小口訣：由上到下、由左到右，慢慢寫、寫漂亮！</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<footer>ㄅㄆㄇ注音樂園 · 百宏文教機構教學專用 · 建議使用 Chrome / Safari，開啟聲音效果最佳 🔊</footer>
+
+<script>
+/* ============ 語音 ============ */
+let voiceTW=null;
+function loadVoices(){
+  const vs=speechSynthesis.getVoices();
+  voiceTW=vs.find(v=>v.lang==='zh-TW'&&/Mei|美/.test(v.name))||vs.find(v=>v.lang==='zh-TW')||vs.find(v=>v.lang&&v.lang.startsWith('zh'))||null;
+}
+if('speechSynthesis' in window){loadVoices();speechSynthesis.onvoiceschanged=loadVoices;}
+function speak(text,rate){
+  if(!('speechSynthesis' in window)){toast('這個瀏覽器不支援語音 😢');return;}
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang='zh-TW'; if(voiceTW)u.voice=voiceTW;
+  u.rate=rate||0.8; u.pitch=1.1;
+  speechSynthesis.speak(u);
+}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');clearTimeout(t._tm);t._tm=setTimeout(()=>t.classList.remove('on'),1600);}
+
+/* ============ 符號資料 ============ */
+// cat: b=聲母 j=介音 y=韻母；say=發音用字；word=例詞；wz=例詞注音；pic=圖像；hint=發音小提示
+const SYMS=[
+ {s:'ㄅ',cat:'b',say:'玻',word:'爸爸',wz:'ㄅㄚˋ ˙ㄅㄚ',pic:'👨',hint:'嘴巴閉緊再彈開，輕輕的「ㄅ」'},
+ {s:'ㄆ',cat:'b',say:'坡',word:'蘋果',wz:'ㄆㄧㄥˊ ㄍㄨㄛˇ',pic:'🍎',hint:'像ㄅ但是用力吐氣，手放嘴前會有風'},
+ {s:'ㄇ',cat:'b',say:'摸',word:'貓咪',wz:'ㄇㄠ ㄇㄧ',pic:'🐱',hint:'嘴巴閉著，鼻子出聲「ㄇ～」'},
+ {s:'ㄈ',cat:'b',say:'佛',word:'飛機',wz:'ㄈㄟ ㄐㄧ',pic:'✈️',hint:'上排牙齒輕咬下嘴唇吹氣'},
+ {s:'ㄉ',cat:'b',say:'德',word:'蛋糕',wz:'ㄉㄢˋ ㄍㄠ',pic:'🎂',hint:'舌尖頂上排牙齒後面，輕輕彈開'},
+ {s:'ㄊ',cat:'b',say:'特',word:'兔子',wz:'ㄊㄨˋ ˙ㄗ',pic:'🐰',hint:'像ㄉ但是用力吐氣'},
+ {s:'ㄋ',cat:'b',say:'訥',word:'牛奶',wz:'ㄋㄧㄡˊ ㄋㄞˇ',pic:'🥛',hint:'舌尖頂住，從鼻子出聲'},
+ {s:'ㄌ',cat:'b',say:'勒',word:'老虎',wz:'ㄌㄠˇ ㄏㄨˇ',pic:'🐯',hint:'舌尖頂住再放開，聲音從舌頭兩邊出來'},
+ {s:'ㄍ',cat:'b',say:'哥',word:'狗狗',wz:'ㄍㄡˇ ㄍㄡˇ',pic:'🐶',hint:'舌頭後面頂住，輕輕的「ㄍ」'},
+ {s:'ㄎ',cat:'b',say:'科',word:'可樂',wz:'ㄎㄜˇ ㄌㄜˋ',pic:'🥤',hint:'像ㄍ但是用力吐氣'},
+ {s:'ㄏ',cat:'b',say:'喝',word:'花朵',wz:'ㄏㄨㄚ ㄉㄨㄛˇ',pic:'🌸',hint:'喉嚨輕輕吹氣「ㄏ～」像哈氣'},
+ {s:'ㄐ',cat:'b',say:'機',word:'公雞',wz:'ㄍㄨㄥ ㄐㄧ',pic:'🐔',hint:'嘴角往兩邊笑，舌面貼近上顎'},
+ {s:'ㄑ',cat:'b',say:'七',word:'氣球',wz:'ㄑㄧˋ ㄑㄧㄡˊ',pic:'🎈',hint:'像ㄐ但是用力吐氣'},
+ {s:'ㄒ',cat:'b',say:'西',word:'西瓜',wz:'ㄒㄧ ㄍㄨㄚ',pic:'🍉',hint:'微笑著輕輕吹氣「ㄒ～」'},
+ {s:'ㄓ',cat:'b',say:'知',word:'蜘蛛',wz:'ㄓ ㄓㄨ',pic:'🕷️',hint:'舌頭翹起來頂上顎（翹舌音）'},
+ {s:'ㄔ',cat:'b',say:'吃',word:'吃飯',wz:'ㄔ ㄈㄢˋ',pic:'🍚',hint:'像ㄓ但是用力吐氣（翹舌音）'},
+ {s:'ㄕ',cat:'b',say:'詩',word:'獅子',wz:'ㄕ ˙ㄗ',pic:'🦁',hint:'舌頭翹起來，輕輕吹氣「ㄕ～」'},
+ {s:'ㄖ',cat:'b',say:'日',word:'太陽（日）',wz:'ㄖˋ',pic:'☀️',hint:'舌頭翹起來，聲帶振動「ㄖ～」'},
+ {s:'ㄗ',cat:'b',say:'資',word:'紫色',wz:'ㄗˇ ㄙㄜˋ',pic:'💜',hint:'舌尖平平的頂牙齒（平舌音）'},
+ {s:'ㄘ',cat:'b',say:'疵',word:'刺蝟',wz:'ㄘˋ ㄨㄟˋ',pic:'🦔',hint:'像ㄗ但是用力吐氣（平舌音）'},
+ {s:'ㄙ',cat:'b',say:'思',word:'松鼠',wz:'ㄙㄨㄥ ㄕㄨˇ',pic:'🐿️',hint:'舌尖平平的，輕輕吹氣「ㄙ～」像蛇'},
+ {s:'ㄧ',cat:'j',say:'衣',word:'衣服',wz:'ㄧ ㄈㄨˊ',pic:'👕',hint:'嘴角往兩邊拉開，「ㄧ～」'},
+ {s:'ㄨ',cat:'j',say:'屋',word:'烏龜',wz:'ㄨ ㄍㄨㄟ',pic:'🐢',hint:'嘴巴嘟成小圓圈，「ㄨ～」'},
+ {s:'ㄩ',cat:'j',say:'迂',word:'下雨',wz:'ㄒㄧㄚˋ ㄩˇ',pic:'☔',hint:'先說ㄧ，嘴巴再嘟圓，就是「ㄩ」'},
+ {s:'ㄚ',cat:'y',say:'啊',word:'張大嘴「啊」',wz:'ㄚ',pic:'😮',hint:'嘴巴張大大，「ㄚ～」看醫生的聲音'},
+ {s:'ㄛ',cat:'y',say:'喔',word:'公雞喔喔叫',wz:'ㄛ ㄛ',pic:'🐓',hint:'嘴巴圓圓的，「ㄛ～」'},
+ {s:'ㄜ',cat:'y',say:'婀',word:'鵝',wz:'ㄜˊ',pic:'🦢',hint:'嘴巴半開不圓，「ㄜ～」'},
+ {s:'ㄝ',cat:'y',say:'耶',word:'耶！好棒',wz:'ㄧㄝˊ',pic:'🙌',hint:'微笑著說「ㄝ」，常和ㄧㄩ做朋友'},
+ {s:'ㄞ',cat:'y',say:'哀',word:'哎呀',wz:'ㄞ ㄧㄚ',pic:'😯',hint:'ㄚ＋ㄧ很快連在一起：「ㄞ」'},
+ {s:'ㄟ',cat:'y',say:'欸',word:'ㄟ～打招呼',wz:'ㄟ',pic:'👋',hint:'ㄝ＋ㄧ很快連在一起：「ㄟ」'},
+ {s:'ㄠ',cat:'y',say:'凹',word:'凹下去',wz:'ㄠ ㄒㄧㄚˋ ˙ㄑㄩ',pic:'🕳️',hint:'ㄚ＋ㄨ很快連在一起：「ㄠ」'},
+ {s:'ㄡ',cat:'y',say:'歐',word:'海鷗',wz:'ㄏㄞˇ ㄡ',pic:'🕊️',hint:'ㄛ＋ㄨ很快連在一起：「ㄡ」'},
+ {s:'ㄢ',cat:'y',say:'安',word:'安全帽',wz:'ㄢ ㄑㄩㄢˊ ㄇㄠˋ',pic:'⛑️',hint:'ㄚ的後面加上ㄋ的尾巴：「ㄢ」'},
+ {s:'ㄣ',cat:'y',say:'恩',word:'按門鈴「嗯」',wz:'ㄣ',pic:'🔔',hint:'ㄜ的後面加上ㄋ的尾巴：「ㄣ」'},
+ {s:'ㄤ',cat:'y',say:'骯',word:'昂首挺胸',wz:'ㄤˊ ㄕㄡˇ',pic:'💪',hint:'嘴巴張開，鼻音長長的：「ㄤ～」'},
+ {s:'ㄥ',cat:'y',say:'鞥',word:'燈（ㄉ＋ㄥ）',wz:'ㄉㄥ',pic:'🏮',hint:'嘴巴半開，鼻音長長的：「ㄥ～」'},
+ {s:'ㄦ',cat:'y',say:'兒',word:'耳朵',wz:'ㄦˇ ˙ㄉㄨㄛ',pic:'👂',hint:'說ㄜ的時候舌頭往上捲：「ㄦ」'}
+];
+
+/* ============ 音節字典（聲調1~5，- 表示沒有常用字）============ */
+const D={
+'ㄚ':'啊----','ㄛ':'喔----','ㄜ':'-鵝-餓-','ㄞ':'哀-矮愛-','ㄟ':'欸----','ㄠ':'凹熬-傲-','ㄡ':'歐-偶--',
+'ㄢ':'安--暗-','ㄣ':'恩----','ㄤ':'-昂---','ㄦ':'-兒耳二-','ㄧ':'一姨椅億-','ㄨ':'屋無五物-','ㄩ':'-魚雨玉-',
+'ㄧㄚ':'鴨牙雅亞-','ㄧㄝ':'耶爺也夜-','ㄧㄠ':'腰搖咬要-','ㄧㄡ':'優油有又-','ㄧㄢ':'煙鹽眼燕-','ㄧㄣ':'音銀引印-','ㄧㄤ':'央羊養樣-','ㄧㄥ':'鷹迎影硬-',
+'ㄨㄚ':'蛙娃瓦襪-','ㄨㄛ':'窩-我臥-','ㄨㄞ':'歪--外-','ㄨㄟ':'威圍尾味-','ㄨㄢ':'彎完碗萬-','ㄨㄣ':'溫文穩問-','ㄨㄤ':'汪王網忘-','ㄨㄥ':'翁----',
+'ㄩㄝ':'約--月-','ㄩㄢ':'冤元遠院-','ㄩㄣ':'暈雲-運-','ㄩㄥ':'--勇用-',
+'ㄅㄚ':'八拔把爸吧','ㄅㄛ':'波伯跛播-','ㄅㄞ':'掰白百拜-','ㄅㄟ':'杯-北貝-','ㄅㄠ':'包-飽抱-','ㄅㄢ':'班-板半-','ㄅㄣ':'奔--笨-','ㄅㄤ':'幫-綁棒-','ㄅㄥ':'崩--蹦-',
+'ㄅㄧ':'逼鼻筆必-','ㄅㄧㄝ':'鱉別---','ㄅㄧㄠ':'標-表--','ㄅㄧㄢ':'邊-扁變-','ㄅㄧㄣ':'賓----','ㄅㄧㄥ':'冰-餅病-','ㄅㄨ':'--補布-',
+'ㄆㄚ':'趴爬-怕-','ㄆㄛ':'坡婆-破-','ㄆㄞ':'拍排-派-','ㄆㄟ':'-陪-配-','ㄆㄠ':'拋-跑泡-','ㄆㄢ':'攀盤-盼-','ㄆㄣ':'噴盆---','ㄆㄤ':'乓旁-胖-','ㄆㄥ':'砰朋-碰-',
+'ㄆㄧ':'批皮匹屁-','ㄆㄧㄝ':'瞥-撇--','ㄆㄧㄠ':'飄瓢-票-','ㄆㄧㄢ':'篇便-片-','ㄆㄧㄣ':'拼貧品--','ㄆㄧㄥ':'乒平---','ㄆㄨ':'鋪僕普瀑-',
+'ㄇㄚ':'媽麻馬罵嗎','ㄇㄛ':'摸模-墨-','ㄇㄞ':'-埋買賣-','ㄇㄟ':'-眉美妹-','ㄇㄠ':'貓毛-帽-','ㄇㄢ':'-饅滿慢-','ㄇㄣ':'-門-悶-','ㄇㄥ':'-萌猛夢-',
+'ㄇㄧ':'咪迷米密-','ㄇㄧㄝ':'咩--滅-','ㄇㄧㄠ':'喵苗秒妙-','ㄇㄧㄢ':'-棉免面-','ㄇㄧㄣ':'-民敏--','ㄇㄧㄥ':'-明-命-','ㄇㄨ':'--母木-',
+'ㄈㄚ':'發罰法--','ㄈㄛ':'-佛---','ㄈㄟ':'飛肥-費-','ㄈㄡ':'--否--','ㄈㄢ':'翻凡反飯-','ㄈㄣ':'分-粉份-','ㄈㄤ':'方房訪放-','ㄈㄥ':'風縫-鳳-','ㄈㄨ':'夫福府父-',
+'ㄉㄚ':'搭答打大-','ㄉㄜ':'-得--的','ㄉㄞ':'呆--帶-','ㄉㄠ':'刀-島到-','ㄉㄡ':'-抖-豆-','ㄉㄢ':'單-膽蛋-','ㄉㄤ':'當-擋盪-','ㄉㄥ':'燈-等凳-',
+'ㄉㄧ':'低笛底弟-','ㄉㄧㄝ':'爹跌---','ㄉㄧㄠ':'雕--掉-','ㄉㄧㄡ':'丟----','ㄉㄧㄢ':'顛-點電-','ㄉㄧㄥ':'丁-頂訂-',
+'ㄉㄨ':'嘟讀賭度-','ㄉㄨㄛ':'多奪朵跺-','ㄉㄨㄟ':'堆--對-','ㄉㄨㄢ':'端-短段-','ㄉㄨㄣ':'蹲--頓-','ㄉㄨㄥ':'冬-懂動-',
+'ㄊㄚ':'他-塔踏-','ㄊㄜ':'---特-','ㄊㄞ':'胎台-太-','ㄊㄠ':'掏桃討套-','ㄊㄡ':'偷頭-透-','ㄊㄢ':'貪談毯炭-','ㄊㄤ':'湯糖躺燙-','ㄊㄥ':'-疼---',
+'ㄊㄧ':'踢題體替-','ㄊㄧㄝ':'貼-鐵--','ㄊㄧㄠ':'挑條-跳-','ㄊㄧㄢ':'天甜舔--','ㄊㄧㄥ':'聽停---',
+'ㄊㄨ':'凸圖土兔-','ㄊㄨㄛ':'拖駝---','ㄊㄨㄟ':'推-腿退-','ㄊㄨㄢ':'-團---','ㄊㄨㄣ':'吞----','ㄊㄨㄥ':'通同桶痛-',
+'ㄋㄚ':'-拿哪那-','ㄋㄜ':'----呢','ㄋㄞ':'--奶耐-','ㄋㄟ':'---內-','ㄋㄠ':'--腦鬧-','ㄋㄢ':'-男---','ㄋㄥ':'-能---',
+'ㄋㄧ':'-泥你逆-','ㄋㄧㄝ':'捏----','ㄋㄧㄠ':'--鳥尿-','ㄋㄧㄡ':'-牛扭--','ㄋㄧㄢ':'-年-念-','ㄋㄧㄣ':'-您---','ㄋㄧㄤ':'-娘---','ㄋㄧㄥ':'-寧---',
+'ㄋㄨ':'-奴努怒-','ㄋㄨㄛ':'-挪-糯-','ㄋㄨㄢ':'--暖--','ㄋㄨㄥ':'-農-弄-','ㄋㄩ':'--女--','ㄋㄩㄝ':'---虐-',
+'ㄌㄚ':'拉--辣啦','ㄌㄜ':'---樂了','ㄌㄞ':'-來-賴-','ㄌㄟ':'-雷壘淚-','ㄌㄠ':'撈勞老--','ㄌㄡ':'-樓-漏-','ㄌㄢ':'-藍懶爛-','ㄌㄤ':'-狼朗浪-','ㄌㄥ':'--冷--',
+'ㄌㄧ':'-梨裡力-','ㄌㄧㄝ':'---列-','ㄌㄧㄠ':'-聊-料-','ㄌㄧㄡ':'溜流-六-','ㄌㄧㄢ':'-連臉練-','ㄌㄧㄣ':'-林---','ㄌㄧㄤ':'-涼兩亮-','ㄌㄧㄥ':'-鈴領另-',
+'ㄌㄨ':'-爐-路-','ㄌㄨㄛ':'-羅-落-','ㄌㄨㄢ':'--卵亂-','ㄌㄨㄣ':'-輪-論-','ㄌㄨㄥ':'-龍---','ㄌㄩ':'-驢旅綠-','ㄌㄩㄝ':'---略-',
+'ㄍㄜ':'哥格-個-','ㄍㄞ':'該-改蓋-','ㄍㄟ':'--給--','ㄍㄠ':'高-稿告-','ㄍㄡ':'勾-狗夠-','ㄍㄢ':'乾-感幹-','ㄍㄣ':'根----','ㄍㄤ':'剛-港槓-','ㄍㄥ':'更----',
+'ㄍㄨ':'姑-古故-','ㄍㄨㄚ':'瓜--掛-','ㄍㄨㄛ':'鍋國果過-','ㄍㄨㄞ':'乖-拐怪-','ㄍㄨㄟ':'龜-鬼貴-','ㄍㄨㄢ':'關-管罐-','ㄍㄨㄣ':'--滾棍-','ㄍㄨㄤ':'光-廣逛-','ㄍㄨㄥ':'公-鞏共-',
+'ㄎㄚ':'咖-卡--','ㄎㄜ':'科殼可課-','ㄎㄞ':'開----','ㄎㄠ':'--烤靠-','ㄎㄡ':'摳-口扣-','ㄎㄢ':'刊-砍看-','ㄎㄣ':'--肯--','ㄎㄤ':'康--抗-','ㄎㄥ':'坑----',
+'ㄎㄨ':'哭-苦褲-','ㄎㄨㄚ':'誇--跨-','ㄎㄨㄛ':'---闊-','ㄎㄨㄞ':'---快-','ㄎㄨㄟ':'虧--愧-','ㄎㄨㄢ':'寬-款--','ㄎㄨㄣ':'昆-捆困-','ㄎㄨㄤ':'-狂-況-','ㄎㄨㄥ':'空-恐控-',
+'ㄏㄚ':'哈----','ㄏㄜ':'喝河-賀-','ㄏㄞ':'嗨孩海害-','ㄏㄟ':'黑----','ㄏㄠ':'--好號-','ㄏㄡ':'-猴吼後-','ㄏㄢ':'-含喊漢-','ㄏㄣ':'--很恨-','ㄏㄤ':'-航---','ㄏㄥ':'哼衡---',
+'ㄏㄨ':'呼湖虎護-','ㄏㄨㄚ':'花華-話-','ㄏㄨㄛ':'-活火貨-','ㄏㄨㄞ':'-懷-壞-','ㄏㄨㄟ':'灰回毀會-','ㄏㄨㄢ':'歡環緩換-','ㄏㄨㄣ':'婚魂-混-','ㄏㄨㄤ':'慌黃謊晃-','ㄏㄨㄥ':'轟紅---',
+'ㄐㄧ':'雞急擠記-','ㄐㄧㄚ':'家夾甲價-','ㄐㄧㄝ':'接節姐借-','ㄐㄧㄠ':'交-腳叫-','ㄐㄧㄡ':'究-九舊-','ㄐㄧㄢ':'尖-剪見-','ㄐㄧㄣ':'金-緊進-','ㄐㄧㄤ':'江-講醬-','ㄐㄧㄥ':'經-井敬-',
+'ㄐㄩ':'居局舉句-','ㄐㄩㄝ':'-絕-覺-','ㄐㄩㄢ':'捐-捲--','ㄐㄩㄣ':'軍--俊-',
+'ㄑㄧ':'七旗起氣-','ㄑㄧㄝ':'切茄且--','ㄑㄧㄠ':'敲橋巧翹-','ㄑㄧㄡ':'秋球---','ㄑㄧㄢ':'千錢淺欠-','ㄑㄧㄣ':'親琴---','ㄑㄧㄤ':'槍牆搶--','ㄑㄧㄥ':'青晴請慶-',
+'ㄑㄩ':'區-取去-','ㄑㄩㄝ':'缺--卻-','ㄑㄩㄢ':'圈全犬勸-','ㄑㄩㄣ':'-群---',
+'ㄒㄧ':'西習洗細-','ㄒㄧㄚ':'蝦霞-夏-','ㄒㄧㄝ':'些鞋寫謝-','ㄒㄧㄠ':'消-小笑-','ㄒㄧㄡ':'修--秀-','ㄒㄧㄢ':'先鹹險線-','ㄒㄧㄣ':'心--信-','ㄒㄧㄤ':'香-想向-','ㄒㄧㄥ':'星行醒幸-',
+'ㄒㄩ':'需徐許續-','ㄒㄩㄝ':'靴學雪血-','ㄒㄩㄢ':'宣旋選--','ㄒㄩㄣ':'薰尋-訓-','ㄒㄩㄥ':'兄雄---',
+'ㄓ':'知直紙治-','ㄓㄚ':'渣--炸-','ㄓㄜ':'遮折者這-','ㄓㄞ':'摘宅窄債-','ㄓㄠ':'招-找照-','ㄓㄡ':'州軸肘皺-','ㄓㄢ':'沾-展站-','ㄓㄣ':'真-枕陣-','ㄓㄤ':'張-掌帳-','ㄓㄥ':'爭-整正-',
+'ㄓㄨ':'豬竹煮住-','ㄓㄨㄚ':'抓-爪--','ㄓㄨㄛ':'桌----','ㄓㄨㄟ':'追--墜-','ㄓㄨㄢ':'專-轉賺-','ㄓㄨㄣ':'--準--','ㄓㄨㄤ':'裝--壯-','ㄓㄨㄥ':'中-種重-',
+'ㄔ':'吃池尺翅-','ㄔㄚ':'插茶-岔-','ㄔㄜ':'車-扯--','ㄔㄞ':'拆柴---','ㄔㄠ':'超朝吵--','ㄔㄡ':'抽愁醜臭-','ㄔㄢ':'摻蟬產--','ㄔㄣ':'-陳-趁-','ㄔㄤ':'昌常廠唱-','ㄔㄥ':'稱成---',
+'ㄔㄨ':'出除楚處-','ㄔㄨㄟ':'吹垂---','ㄔㄨㄢ':'穿船喘串-','ㄔㄨㄣ':'春純---','ㄔㄨㄤ':'窗床闖創-','ㄔㄨㄥ':'充蟲寵--',
+'ㄕ':'詩十使是-','ㄕㄚ':'沙-傻--','ㄕㄜ':'-蛇捨射-','ㄕㄞ':'篩--曬-','ㄕㄟ':'-誰---','ㄕㄠ':'燒勺少哨-','ㄕㄡ':'收-手瘦-','ㄕㄢ':'山-閃扇-','ㄕㄣ':'深神審--','ㄕㄤ':'傷-賞上-','ㄕㄥ':'生繩省勝-',
+'ㄕㄨ':'書熟鼠樹-','ㄕㄨㄚ':'刷-耍--','ㄕㄨㄛ':'說----','ㄕㄨㄞ':'摔-甩帥-','ㄕㄨㄟ':'--水睡-','ㄕㄨㄢ':'栓----','ㄕㄨㄣ':'---順-','ㄕㄨㄤ':'雙-爽--',
+'ㄖ':'---日-','ㄖㄜ':'--惹熱-','ㄖㄠ':'-饒擾繞-','ㄖㄡ':'-柔-肉-','ㄖㄢ':'-然染--','ㄖㄣ':'-人忍認-','ㄖㄤ':'--嚷讓-','ㄖㄥ':'扔仍---',
+'ㄖㄨ':'-如乳入-','ㄖㄨㄛ':'---弱-','ㄖㄨㄟ':'---銳-','ㄖㄨㄢ':'--軟--','ㄖㄨㄣ':'---潤-','ㄖㄨㄥ':'-容---',
+'ㄗ':'資-紫字-','ㄗㄚ':'-雜---','ㄗㄜ':'-責---','ㄗㄞ':'栽-宰在-','ㄗㄟ':'-賊---','ㄗㄠ':'糟-早造-','ㄗㄡ':'--走奏-','ㄗㄢ':'-咱-讚-','ㄗㄣ':'--怎--','ㄗㄤ':'髒--葬-','ㄗㄥ':'增--贈-',
+'ㄗㄨ':'租足組--','ㄗㄨㄛ':'-昨左坐-','ㄗㄨㄟ':'--嘴最-','ㄗㄨㄢ':'鑽----','ㄗㄨㄣ':'尊----','ㄗㄨㄥ':'宗-總縱-',
+'ㄘ':'-詞此次-','ㄘㄚ':'擦----','ㄘㄜ':'---冊-','ㄘㄞ':'猜才彩菜-','ㄘㄠ':'操槽草--','ㄘㄡ':'---湊-','ㄘㄢ':'餐殘-燦-','ㄘㄤ':'倉藏---','ㄘㄥ':'-層---',
+'ㄘㄨ':'粗--醋-','ㄘㄨㄛ':'搓--錯-','ㄘㄨㄟ':'催--脆-','ㄘㄨㄣ':'村存---','ㄘㄨㄥ':'聰從---',
+'ㄙ':'絲-死四-','ㄙㄚ':'撒-灑--','ㄙㄜ':'---色-','ㄙㄞ':'塞--賽-','ㄙㄠ':'搔-掃--','ㄙㄡ':'搜----','ㄙㄢ':'三-傘散-','ㄙㄣ':'森----','ㄙㄤ':'桑-嗓--','ㄙㄥ':'僧----',
+'ㄙㄨ':'蘇俗-速-','ㄙㄨㄛ':'縮-鎖--','ㄙㄨㄟ':'雖隨-歲-','ㄙㄨㄢ':'酸--算-','ㄙㄨㄣ':'孫----','ㄙㄨㄥ':'鬆--送-'
+};
+const TONES=[{n:1,mk:'',lbl:'一聲',sym:'—'},{n:2,mk:'ˊ',lbl:'二聲',sym:'ˊ'},{n:3,mk:'ˇ',lbl:'三聲',sym:'ˇ'},{n:4,mk:'ˋ',lbl:'四聲',sym:'ˋ'},{n:5,mk:'˙',lbl:'輕聲',sym:'˙'}];
+function tonedZ(syl,t){return t===5?('˙'+syl):(syl+TONES[t-1].mk);}
+function lookup(syl,t){const e=D[syl];if(!e)return null;const c=e[t-1];return (c&&c!=='-')?c:null;}
+
+/* ============ 分頁切換 ============ */
+document.querySelectorAll('.tab').forEach(b=>{
+  b.onclick=()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+    document.querySelectorAll('.page').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    document.getElementById('pg-'+b.dataset.pg).classList.add('on');
+    speechSynthesis&&speechSynthesis.cancel();
+  };
+});
+
+/* ============ 七堂課課程表 ============ */
+const PLAN=[
+ {t:'第 1 堂｜認識聲調＋韻符家族（一）',syms:['ㄚ','ㄛ','ㄜ','ㄝ','ㄞ','ㄟ','ㄠ','ㄡ'],
+  goal:'會唱聲調手勢歌（一聲平、二聲揚、三聲轉彎、四聲降、輕聲輕輕的），認識 8 個單韻／複韻',
+  flow:[['10分','暖身：聲調手勢歌，用「ㄚ」唱五種聲調'],['30分','新教：ㄚㄛㄜㄝ（圖像聯想＋發音＋描寫練習）'],['20分','新教：ㄞㄟㄠㄡ，玩「兩個音黏在一起」的滑音遊戲'],['20分','「學注音」頁逐一點讀＋描寫；「拼拼看」用單韻配五種聲調'],['10分','驗收：聽音找符號遊戲（限今日 8 個符號）']]},
+ {t:'第 2 堂｜韻符家族（二）＋介音三兄弟',syms:['ㄢ','ㄣ','ㄤ','ㄥ','ㄦ','ㄧ','ㄨ','ㄩ'],
+  goal:'學會鼻音韻尾 ㄢㄣㄤㄥ、捲舌韻 ㄦ，以及介音 ㄧㄨㄩ；初步認識結合韻',
+  flow:[['10分','暖身：複習第 1 堂 8 個韻符＋聲調操'],['30分','新教：ㄢㄣㄤㄥㄦ（摸鼻子感覺鼻音震動）'],['20分','新教：ㄧㄨㄩ，嘴型對比遊戲（扁嘴／圓嘴）'],['20分','「拼拼看」結合韻表：ㄧㄚ、ㄨㄚ、ㄩㄝ⋯⋯老師帶讀'],['10分','驗收：配對翻翻樂']]},
+ {t:'第 3 堂｜聲母出發！ㄅㄆㄇㄈ・ㄉㄊㄋㄌ',syms:['ㄅ','ㄆ','ㄇ','ㄈ','ㄉ','ㄊ','ㄋ','ㄌ'],
+  goal:'認識 8 個聲母，學會「聲母＋韻母」兩拼法（直接拼讀：ㄅ＋ㄚ→ㄅㄚ）',
+  flow:[['10分','暖身：韻符快閃卡複習'],['30分','新教：ㄅㄆㄇㄈ（手放嘴前感覺送氣）＋描寫'],['20分','新教：ㄉㄊㄋㄌ（舌尖體操）＋描寫'],['20分','拼音小火車：兩拼練習（ㄅㄚ、ㄇㄚ、ㄉㄚ⋯⋯配聲調認國字）'],['10分','驗收：聽音找符號＋氣球大作戰']]},
+ {t:'第 4 堂｜ㄍㄎㄏ・ㄐㄑㄒ＋三拼初體驗',syms:['ㄍ','ㄎ','ㄏ','ㄐ','ㄑ','ㄒ'],
+  goal:'認識 6 個聲母；學會「聲母＋介音＋韻母」三拼法（ㄐ＋ㄧ＋ㄚ→ㄐㄧㄚ）',
+  flow:[['10分','暖身：兩拼火車接龍（每人拼一個）'],['25分','新教：ㄍㄎㄏ（喉嚨的聲音）＋描寫'],['25分','新教：ㄐㄑㄒ（微笑的聲音，只和ㄧㄩ做朋友）'],['20分','拼音小火車三拼：ㄐㄧㄚ家、ㄒㄧㄠ小、ㄑㄧㄡ球⋯⋯'],['10分','驗收：氣球大作戰']]},
+ {t:'第 5 堂｜翹舌平舌大對決 ㄓㄔㄕㄖ・ㄗㄘㄙ',syms:['ㄓ','ㄔ','ㄕ','ㄖ','ㄗ','ㄘ','ㄙ'],
+  goal:'分辨翹舌音與平舌音；知道 ㄓㄔㄕㄖㄗㄘㄙ 可以單獨唸（空韻）',
+  flow:[['10分','暖身：三拼火車複習'],['30分','新教：ㄓㄔㄕㄖ（舌頭翹起來像溜滑梯）'],['25分','新教：ㄗㄘㄙ（舌頭平平的）；對比遊戲：ㄓ／ㄗ、ㄕ／ㄙ 聽辨'],['15分','拼音小火車：ㄓㄨ豬、ㄕㄨ書、ㄗㄨㄛ坐⋯⋯'],['10分','驗收：聽音找符號（混入易混淆組）']]},
+ {t:'第 6 堂｜結合韻總動員＋唸課文',syms:['結合韻','三拼'],
+  goal:'熟練 22 個結合韻與三拼；能跟讀課文〈小白兔〉〈下雨了〉',
+  flow:[['10分','暖身：37 符號大點名（快閃卡）'],['25分','結合韻快速練習表：分組比賽點讀'],['25分','拼音小火車自由拼：孩子上台當小司機'],['20分','課文〈小白兔〉〈下雨了〉：先逐字點讀，再整句跟讀'],['10分','驗收：配對翻翻樂']]},
+ {t:'第 7 堂｜總複習闖關大會',syms:['總複習'],
+  goal:'37 個符號全部認得、會拼讀、會唸課文；用遊戲闖關驗收',
+  flow:[['10分','暖身：聲調手勢歌總複習'],['20分','課文〈上學去〉：點讀＋分組朗讀比賽'],['20分','第一關：聽音找符號（連對 5 題過關）'],['20分','第二關：氣球大作戰（8 分以上過關）'],['20分','第三關：拼音小火車隨機拼讀＋頒發「注音小達人」獎狀 🏅']]}
+];
+(function renderPlan(){
+  const box=document.getElementById('planList');
+  PLAN.forEach((L,i)=>{
+    const d=document.createElement('div');d.className='card lesson';
+    d.innerHTML='<h3>'+L.t+'</h3><div>'+L.syms.map(s=>'<span class="tag">'+s+'</span>').join('')+'</div>'+
+      '<div style="font-size:14px;margin-top:6px">🎯 目標：'+L.goal+'</div>'+
+      '<div class="flow">'+L.flow.map(f=>'<div><b>'+f[0]+'</b><span>'+f[1]+'</span></div>').join('')+'</div>';
+    box.appendChild(d);
+  });
+})();
+
+/* ============ 學注音 ============ */
+const grid=document.getElementById('symGrid');
+SYMS.forEach((o,i)=>{
+  const d=document.createElement('div');
+  d.className='sym cat-'+o.cat;
+  d.innerHTML='<div class="z">'+o.s+'</div><div class="e">'+o.pic+'</div><div class="w">'+o.word+'</div>';
+  d.onclick=()=>openModal(i);
+  grid.appendChild(d);
+});
+let curIdx=0;
+const modal=document.getElementById('modal');
+function openModal(i){
+  curIdx=i;const o=SYMS[i];
+  document.getElementById('mZ').textContent=o.s;
+  document.getElementById('mPic').textContent=o.pic;
+  document.getElementById('mWord').textContent=o.word;
+  document.getElementById('mWordZ').textContent=o.wz;
+  document.getElementById('mHint').textContent='💡 '+o.hint;
+  modal.classList.add('on');
+  resetTrace();
+  speak(o.say);
+}
+document.getElementById('mclose').onclick=()=>modal.classList.remove('on');
+modal.onclick=e=>{if(e.target===modal)modal.classList.remove('on');};
+document.getElementById('mSay').onclick=()=>speak(SYMS[curIdx].say);
+document.getElementById('mSayWord').onclick=()=>speak(SYMS[curIdx].word.replace(/（.*）/,''),0.75);
+document.getElementById('mPrev').onclick=()=>openModal((curIdx+SYMS.length-1)%SYMS.length);
+document.getElementById('mNext').onclick=()=>openModal((curIdx+1)%SYMS.length);
+
+/* 描寫畫布 */
+const tc=document.getElementById('trace'),ctx=tc.getContext('2d');
+function resetTrace(){
+  ctx.clearRect(0,0,tc.width,tc.height);
+  // 田字格
+  ctx.strokeStyle='#CFE6DF';ctx.lineWidth=2;ctx.setLineDash([8,6]);
+  ctx.beginPath();ctx.moveTo(tc.width/2,0);ctx.lineTo(tc.width/2,tc.height);
+  ctx.moveTo(0,tc.height/2);ctx.lineTo(tc.width,tc.height/2);ctx.stroke();ctx.setLineDash([]);
+  // 淡淡的範字
+  ctx.fillStyle='rgba(43,58,85,.14)';
+  ctx.font='240px "DFKai-SB","BiauKai","KaiTi","TW-Kai",serif';
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(SYMS[curIdx].s,tc.width/2,tc.height/2+12);
+}
+let drawing=false,last=null;
+function pos(e){
+  const r=tc.getBoundingClientRect();
+  const p=e.touches?e.touches[0]:e;
+  return {x:(p.clientX-r.left)*tc.width/r.width,y:(p.clientY-r.top)*tc.height/r.height};
+}
+function down(e){drawing=true;last=pos(e);e.preventDefault();}
+function move(e){
+  if(!drawing)return;const p=pos(e);
+  ctx.strokeStyle='#FF8A3D';ctx.lineWidth=14;ctx.lineCap='round';ctx.lineJoin='round';
+  ctx.beginPath();ctx.moveTo(last.x,last.y);ctx.lineTo(p.x,p.y);ctx.stroke();
+  last=p;e.preventDefault();
+}
+tc.addEventListener('pointerdown',down);tc.addEventListener('pointermove',move);
+window.addEventListener('pointerup',()=>drawing=false);
+document.getElementById('traceClear').onclick=resetTrace;
+
+/* ============ 拼音小火車 ============ */
+const INITIALS=SYMS.filter(o=>o.cat==='b').map(o=>o.s);
+const MEDIALS=['ㄧ','ㄨ','ㄩ'];
+const FINALS=['ㄚ','ㄛ','ㄜ','ㄝ','ㄞ','ㄟ','ㄠ','ㄡ','ㄢ','ㄣ','ㄤ','ㄥ','ㄦ'];
+let selI='',selM='',selF='',selT=1;
+function buildPicker(id,items,setter){
+  const box=document.getElementById(id);box.innerHTML='';
+  const none=document.createElement('button');none.className='pk';none.style.fontSize='15px';none.style.fontFamily='var(--body)';none.textContent='不要';
+  none.onclick=()=>{setter('');renderTrain();box.classList.remove('on');};
+  box.appendChild(none);
+  items.forEach(s=>{
+    const b=document.createElement('button');b.className='pk';b.textContent=s;
+    b.onclick=()=>{setter(s);renderTrain();box.classList.remove('on');speak(SYMS.find(o=>o.s===s).say);};
+    box.appendChild(b);
+  });
+}
+buildPicker('pickI',INITIALS,v=>selI=v);
+buildPicker('pickM',MEDIALS,v=>selM=v);
+buildPicker('pickF',FINALS,v=>selF=v);
+function togglePick(id){
+  ['pickI','pickM','pickF'].forEach(p=>{
+    document.getElementById(p).classList.toggle('on',p===id&&!document.getElementById(p).classList.contains('on'));
+  });
+}
+document.getElementById('carI').onclick=()=>togglePick('pickI');
+document.getElementById('carM').onclick=()=>togglePick('pickM');
+document.getElementById('carF').onclick=()=>togglePick('pickF');
+function setCar(id,val){
+  const el=document.getElementById(id);
+  if(val){el.textContent=val;el.classList.remove('empty');}
+  else{el.textContent='點我選';el.classList.add('empty');}
+}
+function renderTrain(){setCar('carI',selI);setCar('carM',selM);setCar('carF',selF);}
+const toneRow=document.getElementById('toneRow');
+TONES.forEach(t=>{
+  const b=document.createElement('button');b.className='toneBtn'+(t.n===1?' on':'');
+  b.innerHTML=t.sym+'<div style="font-size:11px;font-family:var(--body)">'+t.lbl+'</div>';
+  b.onclick=()=>{selT=t.n;document.querySelectorAll('.toneBtn').forEach(x=>x.classList.remove('on'));b.classList.add('on');};
+  toneRow.appendChild(b);
+});
+function goTrain(){
+  const syl=selI+selM+selF;
+  if(!syl){toast('先選符號，火車才能出發喔！');return;}
+  const z=tonedZ(syl,selT);
+  document.getElementById('resZ').textContent=z;
+  const c=lookup(syl,selT);
+  if(c){
+    document.getElementById('resC').textContent='就是「'+c+'」的音！🎉';
+    speak(c,0.7);
+  }else if(D[syl]){
+    document.getElementById('resC').textContent='這個聲調沒有常用的國字，換個聲調試試！';
+    const any=[1,2,3,4,5].find(t=>lookup(syl,t));
+    if(any)speak(lookup(syl,any),0.7);
+  }else{
+    document.getElementById('resC').textContent='這個組合不常見喔，換一節車廂試試！🚂';
+    toast('換個組合試試看！');
+  }
+}
+document.getElementById('goTrain').onclick=goTrain;
+document.getElementById('clearTrain').onclick=()=>{selI=selM=selF='';renderTrain();document.getElementById('resZ').textContent='—';document.getElementById('resC').textContent='選好符號，火車就出發囉！';};
+document.getElementById('randTrain').onclick=()=>{
+  const keys=Object.keys(D);
+  let k,t,tries=0;
+  do{k=keys[Math.floor(Math.random()*keys.length)];t=1+Math.floor(Math.random()*4);tries++;}while(!lookup(k,t)&&tries<50);
+  selI='';selM='';selF='';
+  let rest=k;
+  if(INITIALS.includes(rest[0])){selI=rest[0];rest=rest.slice(1);}
+  if(rest&&MEDIALS.includes(rest[0])){selM=rest[0];rest=rest.slice(1);}
+  if(rest)selF=rest;
+  selT=t;
+  document.querySelectorAll('.toneBtn').forEach((x,i)=>x.classList.toggle('on',i===t-1));
+  renderTrain();goTrain();
+};
+
+/* 結合韻表 */
+const JOINED=['ㄧㄚ','ㄧㄝ','ㄧㄠ','ㄧㄡ','ㄧㄢ','ㄧㄣ','ㄧㄤ','ㄧㄥ','ㄨㄚ','ㄨㄛ','ㄨㄞ','ㄨㄟ','ㄨㄢ','ㄨㄣ','ㄨㄤ','ㄨㄥ','ㄩㄝ','ㄩㄢ','ㄩㄣ','ㄩㄥ','ㄧㄛ','ㄦ'];
+const jg=document.getElementById('jGrid');
+JOINED.forEach(j=>{
+  const d=document.createElement('div');d.className='jcell';d.textContent=j;
+  d.onclick=()=>{
+    const t=[1,2,3,4].find(t=>lookup(j,t));
+    if(t){speak(lookup(j,t),0.7);toast(j+'，像「'+lookup(j,t)+'」的音');}
+    else speak(j,0.6);
+  };
+  jg.appendChild(d);
+});
+
+/* ============ 課文 ============ */
+// 每個音節：[國字, 注音]
+const POEMS=[
+ {title:'🐰 小白兔',lines:[
+   [['小','ㄒㄧㄠˇ'],['白','ㄅㄞˊ'],['兔','ㄊㄨˋ'],['，','']],
+   [['真','ㄓㄣ'],['可','ㄎㄜˇ'],['愛','ㄞˋ'],['，','']],
+   [['長','ㄔㄤˊ'],['長','ㄔㄤˊ'],['耳','ㄦˇ'],['朵','˙ㄉㄨㄛ'],['豎','ㄕㄨˋ'],['起','ㄑㄧˇ'],['來','ㄌㄞˊ'],['，','']],
+   [['蹦','ㄅㄥˋ'],['蹦','ㄅㄥˋ'],['跳','ㄊㄧㄠˋ'],['跳','ㄊㄧㄠˋ'],['吃','ㄔ'],['青','ㄑㄧㄥ'],['菜','ㄘㄞˋ'],['。','']]
+ ]},
+ {title:'🌧️ 下雨了',lines:[
+   [['滴','ㄉㄧ'],['滴','ㄉㄧ'],['答','ㄉㄚ'],['，','']],
+   [['滴','ㄉㄧ'],['滴','ㄉㄧ'],['答','ㄉㄚ'],['，','']],
+   [['下','ㄒㄧㄚˋ'],['雨','ㄩˇ'],['了','˙ㄌㄜ'],['，','']],
+   [['我','ㄨㄛˇ'],['撐','ㄔㄥ'],['傘','ㄙㄢˇ'],['，','']],
+   [['小','ㄒㄧㄠˇ'],['花','ㄏㄨㄚ'],['小','ㄒㄧㄠˇ'],['草','ㄘㄠˇ'],['笑','ㄒㄧㄠˋ'],['哈','ㄏㄚ'],['哈','ㄏㄚ'],['。','']]
+ ]},
+ {title:'🎒 上學去',lines:[
+   [['太','ㄊㄞˋ'],['陽','ㄧㄤˊ'],['公','ㄍㄨㄥ'],['公','ㄍㄨㄥ'],['起','ㄑㄧˇ'],['得','˙ㄉㄜ'],['早','ㄗㄠˇ'],['，','']],
+   [['背','ㄅㄟ'],['起','ㄑㄧˇ'],['書','ㄕㄨ'],['包','ㄅㄠ'],['上','ㄕㄤˋ'],['學','ㄒㄩㄝˊ'],['校','ㄒㄧㄠˋ'],['，','']],
+   [['見','ㄐㄧㄢˋ'],['到','ㄉㄠˋ'],['老','ㄌㄠˇ'],['師','ㄕ'],['說','ㄕㄨㄛ'],['聲','ㄕㄥ'],['好','ㄏㄠˇ'],['，','']],
+   [['快','ㄎㄨㄞˋ'],['快','ㄎㄨㄞˋ'],['樂','ㄌㄜˋ'],['樂','ㄌㄜˋ'],['學','ㄒㄩㄝˊ'],['注','ㄓㄨˋ'],['音','ㄧㄣ'],['。','']]
+ ]}
+];
+(function renderPoems(){
+  const box=document.getElementById('poemList');
+  POEMS.forEach((p,pi)=>{
+    const card=document.createElement('div');card.className='card';
+    const head=document.createElement('div');head.className='poemTitle';
+    head.innerHTML='<span>'+p.title+'</span>';
+    const playAll=document.createElement('button');playAll.className='btn o';playAll.textContent='🔊 整首唸一遍';
+    playAll.onclick=()=>playPoem(pi);
+    head.appendChild(playAll);
+    card.appendChild(head);
+    p.lines.forEach((line,li)=>{
+      const lp=document.createElement('div');lp.className='pline';
+      line.forEach(([hz,zy])=>{
+        const s=document.createElement('div');s.className='syl';
+        if(!zy){s.style.cursor='default';s.style.background='transparent';s.innerHTML='<div class="zy">&nbsp;</div><div class="hz">'+hz+'</div>';}
+        else{
+          s.innerHTML='<div class="zy">'+zy+'</div><div class="hz">'+hz+'</div>';
+          s.onclick=()=>{speak(hz,0.6);s.classList.add('lit');setTimeout(()=>s.classList.remove('lit'),600);};
+        }
+        lp.appendChild(s);
+      });
+      const lb=document.createElement('button');lb.className='btn w';lb.style.alignSelf='center';lb.style.fontSize='13px';lb.style.padding='6px 10px';lb.textContent='🔊';
+      lb.title='唸這一句';
+      lb.onclick=()=>speak(line.map(x=>x[0]).join(''),0.7);
+      lp.appendChild(lb);
+      card.appendChild(lp);
+    });
+    box.appendChild(card);
+  });
+})();
+function playPoem(pi){
+  const text=POEMS[pi].lines.map(l=>l.map(x=>x[0]).join('')).join('，');
+  speak(text,0.72);
+}
+
+/* ============ 遊戲 ============ */
+document.querySelectorAll('[data-g]').forEach(b=>{
+  b.onclick=()=>{
+    ['g1','g2','g3'].forEach(g=>document.getElementById(g).style.display=(g===b.dataset.g)?'block':'none');
+  };
+});
+document.getElementById('g1').style.display='block';
+
+/* 遊戲1：聽音找符號 */
+let g1ans=null,g1score=0,g1streak=0;
+function g1round(){
+  const pool=[...SYMS];
+  const correct=pool[Math.floor(Math.random()*pool.length)];
+  g1ans=correct;
+  const opts=[correct];
+  while(opts.length<4){
+    const c=pool[Math.floor(Math.random()*pool.length)];
+    if(!opts.includes(c))opts.push(c);
+  }
+  opts.sort(()=>Math.random()-.5);
+  const box=document.getElementById('g1opts');box.innerHTML='';
+  opts.forEach(o=>{
+    const b=document.createElement('button');b.className='opt';b.textContent=o.s;
+    b.onclick=()=>{
+      if(o===g1ans){
+        b.classList.add('good');g1score++;g1streak++;
+        toast(g1streak>=3?'連對 '+g1streak+' 題，太厲害了！🔥':'答對了！🎉');
+        speak('答對了');
+        setTimeout(g1round,900);
+      }else{
+        b.classList.add('bad');g1streak=0;
+        toast('再聽一次，加油！');speak(g1ans.say);
+      }
+      document.getElementById('g1score').textContent=g1score;
+      document.getElementById('g1streak').textContent=g1streak;
+    };
+    box.appendChild(b);
+  });
+  setTimeout(()=>speak(correct.say),300);
+}
+document.getElementById('g1start').onclick=()=>{g1score=0;g1streak=0;document.getElementById('g1score').textContent=0;document.getElementById('g1streak').textContent=0;g1round();};
+document.getElementById('g1play').onclick=()=>{if(g1ans)speak(g1ans.say);else toast('先按「開始遊戲」！');};
+
+/* 遊戲2：配對翻翻樂 */
+let g2open=[],g2lock=false,g2moves=0,g2done=0;
+function g2start(){
+  g2open=[];g2lock=false;g2moves=0;g2done=0;
+  document.getElementById('g2moves').textContent=0;
+  const picks=[...SYMS].sort(()=>Math.random()-.5).slice(0,6);
+  let cards=[];
+  picks.forEach((o,i)=>{cards.push({k:i,txt:o.s,o});cards.push({k:i,txt:o.pic,o});});
+  cards.sort(()=>Math.random()-.5);
+  const box=document.getElementById('g2grid');box.innerHTML='';
+  cards.forEach(c=>{
+    const b=document.createElement('button');b.className='mem';b.textContent='？';
+    b.onclick=()=>{
+      if(g2lock||b.classList.contains('open')||b.classList.contains('done'))return;
+      b.textContent=c.txt;b.classList.add('open');
+      g2open.push({b,c});
+      if(g2open.length===2){
+        g2moves++;document.getElementById('g2moves').textContent=g2moves;
+        g2lock=true;
+        const [a,d]=g2open;
+        if(a.c.k===d.c.k){
+          setTimeout(()=>{
+            a.b.classList.add('done');d.b.classList.add('done');
+            a.b.classList.remove('open');d.b.classList.remove('open');
+            speak(a.c.o.word.replace(/（.*）/,''),0.75);
+            g2open=[];g2lock=false;g2done++;
+            if(g2done===6){toast('全部配對成功！🏆');speak('太棒了，全部配對成功');}
+          },450);
+        }else{
+          setTimeout(()=>{
+            a.b.textContent='？';d.b.textContent='？';
+            a.b.classList.remove('open');d.b.classList.remove('open');
+            g2open=[];g2lock=false;
+          },800);
+        }
+      }
+    };
+    box.appendChild(b);
+  });
+}
+document.getElementById('g2start').onclick=g2start;
+g2start();
+
+/* 遊戲3：氣球大作戰 */
+const BALCOLORS=['#FF6B8A','#2EC4B6','#7B5EA7','#FF8A3D','#5BA8F5','#E8B931'];
+let g3target=null,g3score=0,g3roundN=0;
+function g3newRound(){
+  if(g3roundN>=10){
+    toast('遊戲結束！得分 '+g3score+' 分 🏅');
+    speak(g3score>=8?'恭喜過關，你是注音小達人':'再玩一次，會更厲害喔');
+    return;
+  }
+  g3roundN++;
+  document.getElementById('g3round').textContent=g3roundN;
+  const initialsOnly=SYMS.filter(o=>o.cat==='b');
+  g3target=initialsOnly[Math.floor(Math.random()*initialsOnly.length)];
+  document.getElementById('g3emoji').textContent=g3target.pic;
+  document.getElementById('g3word').textContent=g3target.word.replace(/（.*）/,'')+'，開頭是哪個注音？';
+  speak(g3target.word.replace(/（.*）/,''),0.75);
+  const sea=document.getElementById('g3sea');sea.innerHTML='';
+  const opts=[g3target];
+  while(opts.length<6){
+    const c=SYMS[Math.floor(Math.random()*SYMS.length)];
+    if(!opts.includes(c))opts.push(c);
+  }
+  opts.sort(()=>Math.random()-.5);
+  opts.forEach((o,i)=>{
+    const b=document.createElement('button');b.className='bal';b.textContent=o.s;
+    b.style.background=BALCOLORS[i%BALCOLORS.length];
+    b.style.left=(6+ (i%3)*31 + Math.random()*4)+'%';
+    b.style.top=(i<3? 8+Math.random()*12 : 52+Math.random()*14)+'%';
+    b.style.animationDelay=(Math.random()*2)+'s';
+    b.onclick=()=>{
+      if(o===g3target){
+        g3score++;document.getElementById('g3score').textContent=g3score;
+        b.style.transform='scale(1.6)';b.style.opacity='0';
+        toast('砰！答對了 🎉');
+        setTimeout(g3newRound,800);
+      }else{
+        toast('不是這顆，再聽一次！');
+        speak(g3target.word.replace(/（.*）/,''),0.75);
+      }
+    };
+    sea.appendChild(b);
+  });
+}
+document.getElementById('g3start').onclick=()=>{g3score=0;g3roundN=0;document.getElementById('g3score').textContent=0;g3newRound();};
+document.getElementById('g3play').onclick=()=>{if(g3target)speak(g3target.word.replace(/（.*）/,''),0.75);else toast('先按「開始遊戲」！');};
+</script>
+</body>
+</html>
