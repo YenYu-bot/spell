@@ -194,10 +194,6 @@ footer{text-align:center;font-size:12px;color:#8A97AE;padding:20px}
     <span><span class="dot" style="background:var(--orange)"></span>聲母（21個）</span>
     <span><span class="dot" style="background:var(--grape)"></span>介音（3個）</span>
     <span><span class="dot" style="background:var(--teal)"></span>韻母（13個）</span>
-    <span style="margin-left:auto">🔊 符號發音：
-      <button class="btn t" id="pmZ" style="font-size:13px;padding:5px 10px">注音直唸</button>
-      <button class="btn w" id="pmC" style="font-size:13px;padding:5px 10px">國字示範</button>
-    </span>
   </div>
   <div class="grid" id="symGrid"></div>
 </section>
@@ -356,19 +352,29 @@ function speakChar(ch,zy,rate){
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');clearTimeout(t._tm);t._tm=setTimeout(()=>t.classList.remove('on'),1600);}
 
 /* 符號發音：z=直接唸注音符號（多數zh-TW引擎支援呼讀音），c=用國字示範 */
-let pronMode='z';
+
+/* 每個注音符號的最佳呼讀音來源（一律一聲）
+   - 有合適一聲漢字：直接用漢字（最可靠）
+   - 無合適一聲漢字：用注音拼寫，沒加聲調＝一聲 */
+const PRON={
+'ㄅ':'撥','ㄆ':'坡','ㄇ':'摸','ㄈ':'ㄈㄛ',
+'ㄉ':'ㄉㄜ','ㄊ':'ㄊㄜ','ㄋ':'ㄋㄜ','ㄌ':'ㄌㄜ',
+'ㄍ':'哥','ㄎ':'科','ㄏ':'喝',
+'ㄐ':'機','ㄑ':'七','ㄒ':'西',
+'ㄓ':'之','ㄔ':'吃','ㄕ':'詩','ㄖ':'ㄖ',
+'ㄗ':'資','ㄘ':'疵','ㄙ':'思',
+'ㄧ':'衣','ㄨ':'屋','ㄩ':'迂',
+'ㄚ':'啊','ㄛ':'喔','ㄜ':'婀','ㄝ':'ㄝ',
+'ㄞ':'哀','ㄟ':'欸','ㄠ':'凹','ㄡ':'歐',
+'ㄢ':'安','ㄣ':'恩','ㄤ':'骯','ㄥ':'ㄥ','ㄦ':'ㄦ'};
+
 function speakSym(o){
   if(!('speechSynthesis' in window)){toast('這個瀏覽器不支援語音 😢');return;}
-  if(pronMode==='c'){speak(o.say,0.7);return;}
   speechSynthesis.cancel();
-  const u=new SpeechSynthesisUtterance(o.s);
+  const text=PRON[o.s]||o.say||o.s;
+  const u=new SpeechSynthesisUtterance(text);
   u.lang='zh-TW'; if(voiceTW)u.voice=voiceTW;
-  u.rate=0.55; u.pitch=1.1;
-  let t0=0;
-  u.onstart=()=>{t0=performance.now();};
-  u.onend=()=>{ // 引擎不認得注音字元時通常瞬間結束 → 自動改用國字示範
-    if(t0&&performance.now()-t0<180)speak(o.say,0.7);
-  };
+  u.rate=0.78; u.pitch=1.1;
   speechSynthesis.speak(u);
 }
 
@@ -378,11 +384,11 @@ const SYMS=[
  {s:'ㄅ',cat:'b',say:'撥',word:'爸爸',wz:'ㄅㄚˋ ˙ㄅㄚ',pic:'👨',hint:'嘴巴閉緊再彈開，輕輕的「ㄅ」'},
  {s:'ㄆ',cat:'b',say:'坡',word:'蘋果',wz:'ㄆㄧㄥˊ ㄍㄨㄛˇ',pic:'🍎',hint:'像ㄅ但是用力吐氣，手放嘴前會有風'},
  {s:'ㄇ',cat:'b',say:'摸',word:'貓咪',wz:'ㄇㄠ ㄇㄧ',pic:'🐱',hint:'嘴巴閉著，鼻子出聲「ㄇ～」'},
- {s:'ㄈ',cat:'b',say:'佛',word:'飛機',wz:'ㄈㄟ ㄐㄧ',pic:'✈️',hint:'上排牙齒輕咬下嘴唇吹氣'},
- {s:'ㄉ',cat:'b',say:'德',word:'蛋糕',wz:'ㄉㄢˋ ㄍㄠ',pic:'🎂',hint:'舌尖頂上排牙齒後面，輕輕彈開'},
- {s:'ㄊ',cat:'b',say:'特',word:'兔子',wz:'ㄊㄨˋ ˙ㄗ',pic:'🐰',hint:'像ㄉ但是用力吐氣'},
- {s:'ㄋ',cat:'b',say:'訥',word:'牛奶',wz:'ㄋㄧㄡˊ ㄋㄞˇ',pic:'🥛',hint:'舌尖頂住，從鼻子出聲'},
- {s:'ㄌ',cat:'b',say:'勒',word:'老虎',wz:'ㄌㄠˇ ㄏㄨˇ',pic:'🐯',hint:'舌尖頂住再放開，聲音從舌頭兩邊出來'},
+ {s:'ㄈ',cat:'b',say:'ㄈㄛ',word:'飛機',wz:'ㄈㄟ ㄐㄧ',pic:'✈️',hint:'上排牙齒輕咬下嘴唇吹氣'},
+ {s:'ㄉ',cat:'b',say:'ㄉㄜ',word:'蛋糕',wz:'ㄉㄢˋ ㄍㄠ',pic:'🎂',hint:'舌尖頂上排牙齒後面，輕輕彈開'},
+ {s:'ㄊ',cat:'b',say:'ㄊㄜ',word:'兔子',wz:'ㄊㄨˋ ˙ㄗ',pic:'🐰',hint:'像ㄉ但是用力吐氣'},
+ {s:'ㄋ',cat:'b',say:'ㄋㄜ',word:'牛奶',wz:'ㄋㄧㄡˊ ㄋㄞˇ',pic:'🥛',hint:'舌尖頂住，從鼻子出聲'},
+ {s:'ㄌ',cat:'b',say:'ㄌㄜ',word:'老虎',wz:'ㄌㄠˇ ㄏㄨˇ',pic:'🐯',hint:'舌尖頂住再放開，聲音從舌頭兩邊出來'},
  {s:'ㄍ',cat:'b',say:'哥',word:'狗狗',wz:'ㄍㄡˇ ㄍㄡˇ',pic:'🐶',hint:'舌頭後面頂住，輕輕的「ㄍ」'},
  {s:'ㄎ',cat:'b',say:'科',word:'可樂',wz:'ㄎㄜˇ ㄌㄜˋ',pic:'🥤',hint:'像ㄍ但是用力吐氣'},
  {s:'ㄏ',cat:'b',say:'喝',word:'花朵',wz:'ㄏㄨㄚ ㄉㄨㄛˇ',pic:'🌸',hint:'喉嚨輕輕吹氣「ㄏ～」像哈氣'},
@@ -392,7 +398,7 @@ const SYMS=[
  {s:'ㄓ',cat:'b',say:'知',word:'蜘蛛',wz:'ㄓ ㄓㄨ',pic:'🕷️',hint:'舌頭翹起來頂上顎（翹舌音）'},
  {s:'ㄔ',cat:'b',say:'吃',word:'吃飯',wz:'ㄔ ㄈㄢˋ',pic:'🍚',hint:'像ㄓ但是用力吐氣（翹舌音）'},
  {s:'ㄕ',cat:'b',say:'詩',word:'獅子',wz:'ㄕ ˙ㄗ',pic:'🦁',hint:'舌頭翹起來，輕輕吹氣「ㄕ～」'},
- {s:'ㄖ',cat:'b',say:'日',word:'太陽（日）',wz:'ㄖˋ',pic:'☀️',hint:'舌頭翹起來，聲帶振動「ㄖ～」'},
+ {s:'ㄖ',cat:'b',say:'ㄖ',word:'太陽（日）',wz:'ㄖˋ',pic:'☀️',hint:'舌頭翹起來，聲帶振動「ㄖ～」'},
  {s:'ㄗ',cat:'b',say:'資',word:'紫色',wz:'ㄗˇ ㄙㄜˋ',pic:'💜',hint:'舌尖平平的頂牙齒（平舌音）'},
  {s:'ㄘ',cat:'b',say:'疵',word:'刺蝟',wz:'ㄘˋ ㄨㄟˋ',pic:'🦔',hint:'像ㄗ但是用力吐氣（平舌音）'},
  {s:'ㄙ',cat:'b',say:'思',word:'松鼠',wz:'ㄙㄨㄥ ㄕㄨˇ',pic:'🐿️',hint:'舌尖平平的，輕輕吹氣「ㄙ～」像蛇'},
@@ -401,7 +407,7 @@ const SYMS=[
  {s:'ㄩ',cat:'j',say:'迂',word:'下雨',wz:'ㄒㄧㄚˋ ㄩˇ',pic:'☔',hint:'先說ㄧ，嘴巴再嘟圓，就是「ㄩ」'},
  {s:'ㄚ',cat:'y',say:'啊',word:'張大嘴「啊」',wz:'ㄚ',pic:'😮',hint:'嘴巴張大大，「ㄚ～」看醫生的聲音'},
  {s:'ㄛ',cat:'y',say:'喔',word:'公雞喔喔叫',wz:'ㄛ ㄛ',pic:'🐓',hint:'嘴巴圓圓的，「ㄛ～」'},
- {s:'ㄜ',cat:'y',say:'鵝',word:'鵝',wz:'ㄜˊ',pic:'🦢',hint:'嘴巴半開不圓，「ㄜ～」'},
+ {s:'ㄜ',cat:'y',say:'婀',word:'鵝',wz:'ㄜˊ',pic:'🦢',hint:'嘴巴半開不圓，「ㄜ～」'},
  {s:'ㄝ',cat:'y',say:'耶',word:'耶！好棒',wz:'ㄧㄝˊ',pic:'🙌',hint:'微笑著說「ㄝ」，常和ㄧㄩ做朋友'},
  {s:'ㄞ',cat:'y',say:'哀',word:'哎呀',wz:'ㄞ ㄧㄚ',pic:'😯',hint:'ㄚ＋ㄧ很快連在一起：「ㄞ」'},
  {s:'ㄟ',cat:'y',say:'欸',word:'ㄟ～打招呼',wz:'ㄟ',pic:'👋',hint:'ㄝ＋ㄧ很快連在一起：「ㄟ」'},
@@ -410,8 +416,8 @@ const SYMS=[
  {s:'ㄢ',cat:'y',say:'安',word:'安全帽',wz:'ㄢ ㄑㄩㄢˊ ㄇㄠˋ',pic:'⛑️',hint:'ㄚ的後面加上ㄋ的尾巴：「ㄢ」'},
  {s:'ㄣ',cat:'y',say:'恩',word:'按門鈴「嗯」',wz:'ㄣ',pic:'🔔',hint:'ㄜ的後面加上ㄋ的尾巴：「ㄣ」'},
  {s:'ㄤ',cat:'y',say:'骯',word:'昂首挺胸',wz:'ㄤˊ ㄕㄡˇ',pic:'💪',hint:'嘴巴張開，鼻音長長的：「ㄤ～」'},
- {s:'ㄥ',cat:'y',say:'鞥',word:'燈（ㄉ＋ㄥ）',wz:'ㄉㄥ',pic:'🏮',hint:'嘴巴半開，鼻音長長的：「ㄥ～」'},
- {s:'ㄦ',cat:'y',say:'兒',word:'耳朵',wz:'ㄦˇ ˙ㄉㄨㄛ',pic:'👂',hint:'說ㄜ的時候舌頭往上捲：「ㄦ」'}
+ {s:'ㄥ',cat:'y',say:'ㄥ',word:'燈（ㄉ＋ㄥ）',wz:'ㄉㄥ',pic:'🏮',hint:'嘴巴半開，鼻音長長的：「ㄥ～」'},
+ {s:'ㄦ',cat:'y',say:'ㄦ',word:'耳朵',wz:'ㄦˇ ˙ㄉㄨㄛ',pic:'👂',hint:'說ㄜ的時候舌頭往上捲：「ㄦ」'}
 ];
 
 /* ============ 音節字典（聲調1~5，- 表示沒有常用字）============ */
@@ -472,15 +478,6 @@ function tonedZ(syl,t){return t===5?('˙'+syl):(syl+TONES[t-1].mk);}
 function lookup(syl,t){const e=D[syl];if(!e)return null;const c=e[t-1];return (c&&c!=='-')?c:null;}
 
 /* ============ 分頁切換 ============ */
-const pmZ=document.getElementById('pmZ'),pmC=document.getElementById('pmC');
-function setPM(m){
-  pronMode=m;
-  pmZ.className='btn '+(m==='z'?'t':'w');pmZ.style.cssText='font-size:13px;padding:5px 10px';
-  pmC.className='btn '+(m==='c'?'t':'w');pmC.style.cssText='font-size:13px;padding:5px 10px';
-  toast(m==='z'?'改用注音直唸 🔊':'改用國字示範 🔊');
-}
-pmZ.onclick=()=>setPM('z');
-pmC.onclick=()=>setPM('c');
 
 document.querySelectorAll('.tab').forEach(b=>{
   b.onclick=()=>{
