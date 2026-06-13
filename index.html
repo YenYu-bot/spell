@@ -130,6 +130,33 @@ footer{text-align:center;font-size:12px;color:#8A97AE;padding:20px}
   .bigz{font-size:88px}
   .opt{width:72px;height:72px;font-size:36px}
 }
+
+/* 上課模式 */
+.lp{position:fixed;inset:0;background:var(--sky);z-index:120;display:none;flex-direction:column}
+.lp.on{display:flex}
+.lpHead{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.lpTitle{font-weight:900;font-size:16px;flex:1;line-height:1.3}
+.lpBar{height:10px;background:#E2EDF7;margin:0}
+.lpBar i{display:block;height:100%;background:linear-gradient(90deg,var(--orange),var(--yellow));transition:width .3s}
+.lpBody{flex:1;overflow:auto;padding:16px;width:100%}
+.lpInner{max-width:720px;margin:0 auto}
+.lpFoot{display:flex;gap:10px;justify-content:space-between;padding:10px 14px;background:#fff;box-shadow:0 -2px 8px rgba(0,0,0,.05)}
+.stepTag{display:inline-block;background:var(--grape);color:#fff;border-radius:10px;padding:4px 12px;font-size:14px;font-weight:800;margin-bottom:10px}
+.storyBox{background:#FFF3D6;border-radius:16px;padding:12px 14px;display:flex;gap:12px;align-items:center;margin:10px 0;font-size:15px;line-height:1.8}
+.storyBox .pic{font-size:46px;flex-shrink:0}
+.blendList{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-top:10px}
+.blendItem{background:#fff;border-radius:16px;padding:12px 8px;text-align:center;cursor:pointer;box-shadow:0 3px 0 var(--line);border:none;font-family:var(--body)}
+.blendItem:hover{background:var(--yellow)}
+.blendItem .bz{font-family:var(--kai);font-size:30px;font-weight:700}
+.blendItem .bc{color:#6B7A99;font-size:15px;margin-top:2px}
+.toneDemo{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:10px}
+.toneCard{background:#fff;border-radius:16px;padding:12px 8px;text-align:center;cursor:pointer;box-shadow:0 3px 0 var(--line);width:104px;border:none;font-family:var(--body)}
+.toneCard:hover{background:var(--yellow)}
+.toneCard .tz{font-family:var(--kai);font-size:26px;font-weight:700}
+.toneCard .th{font-family:var(--kai);font-size:34px}
+.toneCard .tn{font-size:13px;color:#6B7A99;margin-top:2px}
+.awardBox{text-align:center;padding:30px 10px}
+.awardBox .medal{font-size:100px;animation:float 2.5s ease-in-out infinite}
 </style>
 </head>
 <body>
@@ -203,6 +230,7 @@ footer{text-align:center;font-size:12px;color:#8A97AE;padding:20px}
 
   <h2 class="sec">🌈 結合韻快速練習（22 個，點了就唸）</h2>
   <div class="card">
+    <div id="jBanner"><div class="hintTxt">點下面任何一個結合韻，先聽聲音，再看它的發音小故事 👇</div></div>
     <div class="jgrid" id="jGrid"></div>
   </div>
 </section>
@@ -269,6 +297,7 @@ footer{text-align:center;font-size:12px;color:#8A97AE;padding:20px}
         <div style="font-size:14px;color:#6B7A99;margin-top:4px" id="mHint"></div>
       </div>
     </div>
+    <div class="storyBox"><div class="pic">📖</div><div id="mStory"></div></div>
     <div style="text-align:center;font-weight:900;margin-top:6px">✍️ 描描看（沿著淡淡的字描一描）</div>
     <canvas class="trace" id="trace" width="320" height="320"></canvas>
     <div class="mrow">
@@ -277,6 +306,21 @@ footer{text-align:center;font-size:12px;color:#8A97AE;padding:20px}
       <button class="btn g" id="mNext">下一個 ➡</button>
     </div>
     <div class="hintTxt">寫字小口訣：由上到下、由左到右，慢慢寫、寫漂亮！</div>
+  </div>
+</div>
+
+<!-- 上課模式 -->
+<div class="lp" id="lp">
+  <div class="lpHead">
+    <button class="btn w" id="lpClose" style="font-size:14px;padding:8px 12px">✕ 離開</button>
+    <div class="lpTitle" id="lpTitle"></div>
+    <div id="lpStepNo" style="font-weight:800;color:#6B7A99;white-space:nowrap"></div>
+  </div>
+  <div class="lpBar" id="lpBar" style="cursor:pointer" title="點任一處跳到該步驟"><i id="lpBarFill" style="width:0%"></i></div>
+  <div class="lpBody"><div class="lpInner" id="lpBody"></div></div>
+  <div class="lpFoot">
+    <button class="btn w" id="lpPrev">⬅ 上一步</button>
+    <button class="btn o" id="lpNext">下一步 ➡</button>
   </div>
 </div>
 
@@ -362,7 +406,7 @@ const SYMS=[
 
 /* ============ 音節字典（聲調1~5，- 表示沒有常用字）============ */
 const D={
-'ㄚ':'啊----','ㄛ':'喔----','ㄜ':'-鵝-餓-','ㄞ':'哀-矮愛-','ㄟ':'欸----','ㄠ':'凹熬-傲-','ㄡ':'歐-偶--',
+'ㄧㄛ':'唷----','ㄚ':'啊----','ㄛ':'喔----','ㄜ':'-鵝-餓-','ㄞ':'哀-矮愛-','ㄟ':'欸----','ㄠ':'凹熬-傲-','ㄡ':'歐-偶--',
 'ㄢ':'安--暗-','ㄣ':'恩----','ㄤ':'-昂---','ㄦ':'-兒耳二-','ㄧ':'一姨椅億-','ㄨ':'屋無五物-','ㄩ':'-魚雨玉-',
 'ㄧㄚ':'鴨牙雅亞-','ㄧㄝ':'耶爺也夜-','ㄧㄠ':'腰搖咬要-','ㄧㄡ':'優油有又-','ㄧㄢ':'煙鹽眼燕-','ㄧㄣ':'音銀引印-','ㄧㄤ':'央羊養樣-','ㄧㄥ':'鷹迎影硬-',
 'ㄨㄚ':'蛙娃瓦襪-','ㄨㄛ':'窩-我臥-','ㄨㄞ':'歪--外-','ㄨㄟ':'威圍尾味-','ㄨㄢ':'彎完碗萬-','ㄨㄣ':'溫文穩問-','ㄨㄤ':'汪王網忘-','ㄨㄥ':'翁----',
@@ -469,6 +513,11 @@ const PLAN=[
     d.innerHTML='<h3>'+L.t+'</h3><div>'+L.syms.map(s=>'<span class="tag">'+s+'</span>').join('')+'</div>'+
       '<div style="font-size:14px;margin-top:6px">🎯 目標：'+L.goal+'</div>'+
       '<div class="flow">'+L.flow.map(f=>'<div><b>'+f[0]+'</b><span>'+f[1]+'</span></div>').join('')+'</div>';
+    const go=document.createElement('button');
+    go.className='btn o';go.style.marginTop='12px';go.style.fontSize='17px';
+    go.textContent='▶ 開始上課（一步一步帶著走）';
+    go.onclick=()=>startLesson(i);
+    d.appendChild(go);
     box.appendChild(d);
   });
 })();
@@ -491,6 +540,7 @@ function openModal(i){
   document.getElementById('mWord').textContent=o.word;
   document.getElementById('mWordZ').textContent=o.wz;
   document.getElementById('mHint').textContent='💡 '+o.hint;
+  document.getElementById('mStory').innerHTML='<b>發音故事：</b>'+STORY[o.s];
   modal.classList.add('on');
   resetTrace();
   speakSym(o);
@@ -607,18 +657,59 @@ document.getElementById('randTrain').onclick=()=>{
   renderTrain();goTrain();
 };
 
-/* 結合韻表 */
-const JOINED=['ㄧㄚ','ㄧㄝ','ㄧㄠ','ㄧㄡ','ㄧㄢ','ㄧㄣ','ㄧㄤ','ㄧㄥ','ㄨㄚ','ㄨㄛ','ㄨㄞ','ㄨㄟ','ㄨㄢ','ㄨㄣ','ㄨㄤ','ㄨㄥ','ㄩㄝ','ㄩㄢ','ㄩㄣ','ㄩㄥ','ㄧㄛ','ㄦ'];
-const jg=document.getElementById('jGrid');
-JOINED.forEach(j=>{
-  const d=document.createElement('div');d.className='jcell';d.textContent=j;
-  d.onclick=()=>{
-    const t=[1,2,3,4].find(t=>lookup(j,t));
-    if(t){speak(lookup(j,t),0.7);toast(j+'，像「'+lookup(j,t)+'」的音');}
-    else speak(j,0.6);
-  };
-  jg.appendChild(d);
-});
+/* 結合韻表（含發音故事） */
+const JOINED=['ㄧㄚ','ㄧㄛ','ㄧㄝ','ㄧㄠ','ㄧㄡ','ㄧㄢ','ㄧㄣ','ㄧㄤ','ㄧㄥ','ㄨㄚ','ㄨㄛ','ㄨㄞ','ㄨㄟ','ㄨㄢ','ㄨㄣ','ㄨㄤ','ㄨㄥ','ㄩㄝ','ㄩㄢ','ㄩㄣ','ㄩㄥ','ㄦ'];
+// 每個結合韻：[圖案, 示範字, 發音故事]
+const JINFO={
+'ㄧㄚ':['🦆','鴨','ㄧ和ㄚ手牽手去池塘，變成小鴨子「ㄧㄚ、ㄧㄚ」叫。'],
+'ㄧㄛ':['😲','唷','看到大驚喜，先笑著說ㄧ、嘴巴變圓喊「ㄧㄛ！」。'],
+'ㄧㄝ':['🙌','耶','比賽贏了！ㄧ和ㄝ開心擊掌：「ㄧㄝ！」。'],
+'ㄧㄠ':['🙆','腰','ㄧ彎下腰撿到ㄠ，扭一扭「ㄧㄠ」，就是腰的音。'],
+'ㄧㄡ':['🏊','游','ㄧ和ㄡ去游泳，悠悠地「ㄧㄡ～」滑過水面。'],
+'ㄧㄢ':['🏭','煙','煙囪冒出白白的煙，「ㄧㄢ～」慢慢飄上天。'],
+'ㄧㄣ':['🎵','音','唱歌的聲「音」真好聽：「ㄧㄣ、ㄧㄣ」。'],
+'ㄧㄤ':['🐑','羊','小羊咩咩叫：「ㄧㄤˊ、ㄧㄤˊ」，跟著媽媽走。'],
+'ㄧㄥ':['🦅','鷹','老鷹張開翅膀，「ㄧㄥ」一聲衝上天空。'],
+'ㄨㄚ':['🐸','蛙','青蛙跳進水裡，「ㄨㄚ！」濺起大水花。'],
+'ㄨㄛ':['🪹','窩','天黑了，小鳥回到溫暖的窩：「ㄨㄛ」。'],
+'ㄨㄞ':['🙃','歪','帽子戴歪了，「ㄨㄞ、ㄨㄞ」的好好笑。'],
+'ㄨㄟ':['📞','喂','接電話先說：「ㄨㄟˊ？請問找誰？」。'],
+'ㄨㄢ':['🥣','碗','圓圓的碗裝滿飯：「ㄨㄢˇ」。'],
+'ㄨㄣ':['🌡️','溫','摸摸額頭量體溫，溫溫的：「ㄨㄣ」。'],
+'ㄨㄤ':['🐶','汪','小狗看到你好開心：「ㄨㄤ！ㄨㄤ！」搖尾巴。'],
+'ㄨㄥ':['🐝','嗡','小蜜蜂繞著花飛：「ㄨㄥ～ㄨㄥ～」採花蜜。'],
+'ㄩㄝ':['🌙','月','彎彎的月亮掛天上：「ㄩㄝˋ」亮。'],
+'ㄩㄢ':['⭕','圓','畫一個圓圓的圈圈：「ㄩㄢˊ」。'],
+'ㄩㄣ':['☁️','雲','天上飄來一朵軟綿綿的雲：「ㄩㄣˊ」。'],
+'ㄩㄥ':['🏊‍♂️','泳','夏天去游泳，「ㄩㄥˇ」進涼涼的水裡。'],
+'ㄦ':['👂','耳','摸摸自己的小耳朵：「ㄦˇ」，舌頭捲起來。']
+};
+function speakJoined(j){
+  const info=JINFO[j];
+  if(info)speak(info[1],0.6);
+  else{const t=[1,2,3,4].find(t=>lookup(j,t));t?speak(lookup(j,t),0.6):speak(j,0.6);}
+}
+function jStoryHTML(j){
+  const [pic,ex,story]=JINFO[j];
+  return '<div class="storyBox"><div class="pic">'+pic+'</div><div><b style="font-family:var(--kai);font-size:22px">'+j+'</b>　像「'+ex+'」的音<br>'+story+'</div></div>';
+}
+function buildJGrid(container,banner,list){
+  container.innerHTML='';
+  list.forEach(j=>{
+    const info=JINFO[j];
+    const d=document.createElement('div');d.className='jcell';
+    d.innerHTML=j+'<div style="font-size:20px">'+(info?info[0]:'')+'</div>';
+    d.onclick=()=>{
+      speakJoined(j);
+      if(banner&&info){
+        banner.innerHTML=jStoryHTML(j)+'<div class="mrow"><button class="btn t" id="jSayStory">🔊 唸故事給我聽</button></div>';
+        banner.querySelector('#jSayStory').onclick=()=>speak(info[2].replace(/[「」～！？。：、]/g,'，'),0.85);
+      }
+    };
+    container.appendChild(d);
+  });
+}
+buildJGrid(document.getElementById('jGrid'),document.getElementById('jBanner'),JOINED);
 
 /* ============ 課文 ============ */
 // 每個音節：[國字, 注音]
@@ -643,35 +734,37 @@ const POEMS=[
    [['快','ㄎㄨㄞˋ'],['快','ㄎㄨㄞˋ'],['樂','ㄌㄜˋ'],['樂','ㄌㄜˋ'],['學','ㄒㄩㄝˊ'],['注','ㄓㄨˋ'],['音','ㄧㄣ'],['。','']]
  ]}
 ];
+function buildPoemCard(pi){
+  const p=POEMS[pi];
+  const card=document.createElement('div');card.className='card';
+  const head=document.createElement('div');head.className='poemTitle';
+  head.innerHTML='<span>'+p.title+'</span>';
+  const playAll=document.createElement('button');playAll.className='btn o';playAll.textContent='🔊 整首唸一遍';
+  playAll.onclick=()=>playPoem(pi);
+  head.appendChild(playAll);
+  card.appendChild(head);
+  p.lines.forEach(line=>{
+    const lp2=document.createElement('div');lp2.className='pline';
+    line.forEach(([hz,zy])=>{
+      const sy=document.createElement('div');sy.className='syl';
+      if(!zy){sy.style.cursor='default';sy.style.background='transparent';sy.innerHTML='<div class="zy">&nbsp;</div><div class="hz">'+hz+'</div>';}
+      else{
+        sy.innerHTML='<div class="zy">'+zy+'</div><div class="hz">'+hz+'</div>';
+        sy.onclick=()=>{speak(hz,0.6);sy.classList.add('lit');setTimeout(()=>sy.classList.remove('lit'),600);};
+      }
+      lp2.appendChild(sy);
+    });
+    const lb=document.createElement('button');lb.className='btn w';lb.style.alignSelf='center';lb.style.fontSize='13px';lb.style.padding='6px 10px';lb.textContent='🔊';
+    lb.title='唸這一句';
+    lb.onclick=()=>speak(line.map(x=>x[0]).join(''),0.7);
+    lp2.appendChild(lb);
+    card.appendChild(lp2);
+  });
+  return card;
+}
 (function renderPoems(){
   const box=document.getElementById('poemList');
-  POEMS.forEach((p,pi)=>{
-    const card=document.createElement('div');card.className='card';
-    const head=document.createElement('div');head.className='poemTitle';
-    head.innerHTML='<span>'+p.title+'</span>';
-    const playAll=document.createElement('button');playAll.className='btn o';playAll.textContent='🔊 整首唸一遍';
-    playAll.onclick=()=>playPoem(pi);
-    head.appendChild(playAll);
-    card.appendChild(head);
-    p.lines.forEach((line,li)=>{
-      const lp=document.createElement('div');lp.className='pline';
-      line.forEach(([hz,zy])=>{
-        const s=document.createElement('div');s.className='syl';
-        if(!zy){s.style.cursor='default';s.style.background='transparent';s.innerHTML='<div class="zy">&nbsp;</div><div class="hz">'+hz+'</div>';}
-        else{
-          s.innerHTML='<div class="zy">'+zy+'</div><div class="hz">'+hz+'</div>';
-          s.onclick=()=>{speak(hz,0.6);s.classList.add('lit');setTimeout(()=>s.classList.remove('lit'),600);};
-        }
-        lp.appendChild(s);
-      });
-      const lb=document.createElement('button');lb.className='btn w';lb.style.alignSelf='center';lb.style.fontSize='13px';lb.style.padding='6px 10px';lb.textContent='🔊';
-      lb.title='唸這一句';
-      lb.onclick=()=>speak(line.map(x=>x[0]).join(''),0.7);
-      lp.appendChild(lb);
-      card.appendChild(lp);
-    });
-    box.appendChild(card);
-  });
+  POEMS.forEach((p,pi)=>box.appendChild(buildPoemCard(pi)));
 })();
 function playPoem(pi){
   const text=POEMS[pi].lines.map(l=>l.map(x=>x[0]).join('')).join('，');
@@ -809,6 +902,232 @@ function g3newRound(){
 }
 document.getElementById('g3start').onclick=()=>{g3score=0;g3roundN=0;document.getElementById('g3score').textContent=0;g3newRound();};
 document.getElementById('g3play').onclick=()=>{if(g3target)speak(g3target.word.replace(/（.*）/,''),0.75);else toast('先按「開始遊戲」！');};
+
+/* ============ 37 個符號的發音故事 ============ */
+const STORY={
+'ㄅ':'爸爸抱寶寶，嘴巴閉緊緊，再「ㄅ」一聲彈開，寶寶咯咯笑。',
+'ㄆ':'山坡上吹大風，「ㄆ～」把帽子吹走了！手放嘴巴前面，會感覺到一陣風。',
+'ㄇ':'小貓咪閉著嘴撒嬌：「ㄇ～ㄇ～」，聲音偷偷從鼻子跑出來。',
+'ㄈ':'飛機要起飛了，門牙輕輕咬住下嘴唇：「ㄈ～」，像風吹過機翼。',
+'ㄉ':'咚咚咚敲小鼓！舌尖在牙齒後面當鼓棒：「ㄉ、ㄉ、ㄉ」。',
+'ㄊ':'小火車出發囉：「ㄊ、ㄊ、ㄊ」，比ㄉ多噴出一口白蒸氣。',
+'ㄋ':'倒牛奶的時候，鼻子哼著歌：「ㄋ～」，舌尖頂著上面不放開。',
+'ㄌ':'老虎甩甩尾巴：「ㄌㄚ！」，聲音從舌頭的兩邊溜出來。',
+'ㄍ':'鴿子咕咕叫：「ㄍ、ㄍ」，這個聲音住在喉嚨的後面。',
+'ㄎ':'感冒咳嗽：「ㄎ、ㄎ」，跟ㄍ住同一個家，但多了一陣風。',
+'ㄏ':'冬天好冷，對著手哈氣：「ㄏ～」，暖暖的。',
+'ㄐ':'小雞嘰嘰叫：「ㄐ、ㄐ」，記得嘴角要往兩邊笑喔。',
+'ㄑ':'切西瓜：「ㄑ！」，笑著用力吐一口氣。',
+'ㄒ':'噓——小聲一點：「ㄒ～」，像小氣球慢慢漏氣的聲音。',
+'ㄓ':'蜘蛛在織網，舌頭翹起來像溜滑梯：「ㄓ」。',
+'ㄔ':'吃麵麵：「ㄔ」，舌頭翹起來，再用力吹一口氣。',
+'ㄕ':'獅子說悄悄話：「ㄕ～」，舌頭翹起來輕輕吹。',
+'ㄖ':'太陽（日）暖暖的：「ㄖ～」，舌頭翹起來，喉嚨會震動。',
+'ㄗ':'小蜜蜂貼著花飛：「ㄗ～」，舌尖平平的貼著牙齒。',
+'ㄘ':'刺蝟的刺好尖：「ㄘ！」，舌頭平平的用力吐氣。',
+'ㄙ':'小蛇爬過草地：「ㄙ～～」，舌尖平平的，輕輕吹長長的氣。',
+'ㄧ':'穿衣服拉拉鍊：「ㄧ～」，嘴巴往兩邊拉開，像在微笑。',
+'ㄨ':'火車進山洞：「ㄨ——」，嘴巴嘟成小小的圓圈。',
+'ㄩ':'小金魚嘟嘴吐泡泡：「ㄩ～」，先微笑說ㄧ，再把嘴巴嘟圓。',
+'ㄚ':'看醫生要張大嘴巴：「ㄚ——」，嘴巴開得大大的。',
+'ㄛ':'公雞早起叫大家起床：「ㄛ～ㄛ～」，嘴巴圓圓的。',
+'ㄜ':'大白鵝在散步：「ㄜ～ㄜ～」，嘴巴半開、不圓不扁。',
+'ㄝ':'收到禮物好開心：「ㄝ！」，咧開嘴笑著說。',
+'ㄞ':'跌倒了：「ㄞ呀！」，是ㄚ和ㄧ手牽手滑在一起的聲音。',
+'ㄟ':'跟好朋友打招呼：「ㄟ～」，是ㄝ和ㄧ黏在一起的聲音。',
+'ㄠ':'地上凹了一個小洞：「ㄠ」，是ㄚ滑向ㄨ的聲音。',
+'ㄡ':'海鷗飛過大海：「ㄡ～」，是ㄛ滑向ㄨ的聲音。',
+'ㄢ':'戴上安全帽：「ㄢ」，最後舌尖要頂住上面，把門關起來。',
+'ㄣ':'按門鈴：「ㄣ」，聲音停在鼻子裡嗡嗡的。',
+'ㄤ':'噹——敲大鐘：「ㄤ～」，嘴巴張開，鼻音拉得長長的。',
+'ㄥ':'打開電燈：「ㄥ」，嘴巴半開，鼻音長長的。',
+'ㄦ':'摸摸小耳朵：「ㄦ」，說ㄜ的時候舌頭往上捲。'
+};
+
+/* ============ 上課模式（七堂課帶著走） ============ */
+function gotoPage(pg){const t=document.querySelector('.tab[data-pg="'+pg+'"]');if(t)t.click();}
+function showGame(g){const b=document.querySelector('[data-g="'+g+'"]');if(b)b.click();}
+
+function makeTrace(canvas,ch){
+  const ctx2=canvas.getContext('2d');
+  function reset(){
+    ctx2.clearRect(0,0,canvas.width,canvas.height);
+    ctx2.strokeStyle='#CFE6DF';ctx2.lineWidth=2;ctx2.setLineDash([8,6]);
+    ctx2.beginPath();ctx2.moveTo(canvas.width/2,0);ctx2.lineTo(canvas.width/2,canvas.height);
+    ctx2.moveTo(0,canvas.height/2);ctx2.lineTo(canvas.width,canvas.height/2);ctx2.stroke();ctx2.setLineDash([]);
+    ctx2.fillStyle='rgba(43,58,85,.14)';
+    ctx2.font=Math.floor(canvas.width*0.75)+'px "DFKai-SB","BiauKai","KaiTi","TW-Kai",serif';
+    ctx2.textAlign='center';ctx2.textBaseline='middle';
+    ctx2.fillText(ch,canvas.width/2,canvas.height/2+10);
+  }
+  let dwg=false,lst=null;
+  function pos2(e){const r=canvas.getBoundingClientRect();const pt=e.touches?e.touches[0]:e;
+    return{x:(pt.clientX-r.left)*canvas.width/r.width,y:(pt.clientY-r.top)*canvas.height/r.height};}
+  canvas.addEventListener('pointerdown',e=>{dwg=true;lst=pos2(e);e.preventDefault();});
+  canvas.addEventListener('pointermove',e=>{
+    if(!dwg)return;const pt=pos2(e);
+    ctx2.strokeStyle='#FF8A3D';ctx2.lineWidth=14;ctx2.lineCap='round';ctx2.lineJoin='round';
+    ctx2.beginPath();ctx2.moveTo(lst.x,lst.y);ctx2.lineTo(pt.x,pt.y);ctx2.stroke();
+    lst=pt;e.preventDefault();});
+  window.addEventListener('pointerup',()=>dwg=false);
+  reset();return reset;
+}
+
+function symSteps(arr){return arr.map((sy,k)=>({t:'sym',i:SYMS.findIndex(o=>o.s===sy),k,n:arr.length}));}
+const LDEF=[
+ {syms:['ㄚ','ㄛ','ㄜ','ㄝ','ㄞ','ㄟ','ㄠ','ㄡ'],
+  pre:[{t:'tones'}],
+  post:[{t:'blend',title:'單韻母配聲調，點一點唸唸看！',items:[['ㄚ',1],['ㄜ',2],['ㄜ',4],['ㄞ',1],['ㄞ',3],['ㄞ',4],['ㄠ',1],['ㄠ',2],['ㄡ',1],['ㄡ',3]]},
+        {t:'game',g:'g1',desc:'聽聲音，找出今天學的符號！連對 5 題就過關 🏁'}]},
+ {syms:['ㄢ','ㄣ','ㄤ','ㄥ','ㄦ','ㄧ','ㄨ','ㄩ'],
+  post:[{t:'joined',list:['ㄧㄚ','ㄧㄝ','ㄧㄡ','ㄨㄚ','ㄨㄛ','ㄨㄟ','ㄩㄝ','ㄩㄢ'],title:'結合韻初體驗：兩個好朋友手牽手'},
+        {t:'game',g:'g2',desc:'把符號和圖案配成對，全部配完就過關 🏁'}]},
+ {syms:['ㄅ','ㄆ','ㄇ','ㄈ','ㄉ','ㄊ','ㄋ','ㄌ'],
+  post:[{t:'blend',title:'兩拼小火車：聲母＋韻母，碰在一起變什麼字？',items:[['ㄅㄚ',1],['ㄅㄚ',4],['ㄆㄚ',2],['ㄇㄚ',1],['ㄇㄚ',3],['ㄈㄢ',4],['ㄉㄚ',3],['ㄊㄨ',4],['ㄋㄞ',3],['ㄌㄠ',3]]},
+        {t:'game',g:'g3',desc:'聽單字，戳破開頭注音的氣球！8 分以上過關 🏁'}]},
+ {syms:['ㄍ','ㄎ','ㄏ','ㄐ','ㄑ','ㄒ'],
+  post:[{t:'blend',title:'三拼挑戰：聲母＋介音＋韻母',items:[['ㄍㄨㄚ',1],['ㄍㄨㄛ',3],['ㄎㄨㄞ',4],['ㄏㄨㄚ',1],['ㄐㄧㄚ',1],['ㄐㄧㄠ',3],['ㄑㄧㄡ',2],['ㄒㄧㄠ',3],['ㄒㄩㄝ',2]]},
+        {t:'game',g:'g3',desc:'氣球大作戰！聽單字找開頭注音 🏁'}]},
+ {syms:['ㄓ','ㄔ','ㄕ','ㄖ','ㄗ','ㄘ','ㄙ'],
+  post:[{t:'blend',title:'翹舌 vs 平舌，仔細聽哪裡不一樣？',items:[['ㄓ',1],['ㄗ',1],['ㄕ',1],['ㄙ',1],['ㄔ',1],['ㄘ',2],['ㄖ',4],['ㄓㄨ',1],['ㄕㄨ',1],['ㄗㄨㄛ',4]]},
+        {t:'game',g:'g1',desc:'聽音找符號（小心混淆音！）連對 5 題過關 🏁'}]},
+ {syms:[],
+  pre:[{t:'joined',list:null,title:'22 個結合韻總動員（點一點，每個都有故事）'},
+       {t:'blend',title:'三拼總練習',items:[['ㄒㄧㄤ',1],['ㄋㄧㄡ',2],['ㄑㄩㄢ',2],['ㄌㄧㄤ',4],['ㄊㄧㄠ',4],['ㄍㄨㄟ',1],['ㄏㄨㄟ',2],['ㄐㄩㄝ',2]]},
+       {t:'poem',list:[0,1]}],
+  post:[{t:'game',g:'g2',desc:'配對翻翻樂驗收！'}]},
+ {syms:[],
+  pre:[{t:'poem',list:[2]},
+       {t:'game',g:'g1',desc:'第一關：聽音找符號，連對 5 題！'},
+       {t:'game',g:'g3',desc:'第二關：氣球大作戰，8 分以上！'}],
+  post:[{t:'award'}]}
+];
+function buildSteps(i){
+  const d=LDEF[i];
+  return [{t:'intro',i}].concat(d.pre||[]).concat(symSteps(d.syms)).concat(d.post||[]);
+}
+
+let curSteps=[],curStep=0,curLesson=0;
+const lp=document.getElementById('lp');
+function progKey(i){return 'bhcs_zhuyin_lesson_'+i;}
+function saveProg(){try{localStorage.setItem(progKey(curLesson),curStep);}catch(e){}}
+function loadProg(i){try{return parseInt(localStorage.getItem(progKey(i))||'0',10)||0;}catch(e){return 0;}}
+function startLesson(i){
+  curLesson=i;curSteps=buildSteps(i);
+  const last=loadProg(i);
+  if(last>0&&last<curSteps.length){
+    curStep=confirm('上次上到第 '+(last+1)+' 步，要從那裡接著上嗎？\n（按「取消」從頭開始）')?last:0;
+  }else curStep=0;
+  document.getElementById('lpTitle').textContent=PLAN[i].t;
+  lp.classList.add('on');
+  renderStep();
+}
+document.getElementById('lpClose').onclick=()=>{lp.classList.remove('on');speechSynthesis&&speechSynthesis.cancel();};
+document.getElementById('lpBar').onclick=(e)=>{
+  const r=e.currentTarget.getBoundingClientRect();
+  const ratio=(e.clientX-r.left)/r.width;
+  const target=Math.min(curSteps.length-1,Math.max(0,Math.floor(ratio*curSteps.length)));
+  curStep=target;saveProg();renderStep();
+};
+document.getElementById('lpPrev').onclick=()=>{if(curStep>0){curStep--;saveProg();renderStep();}};
+document.getElementById('lpNext').onclick=()=>{
+  if(curStep<curSteps.length-1){curStep++;saveProg();renderStep();}
+  else{lp.classList.remove('on');try{localStorage.removeItem(progKey(curLesson));}catch(e){}toast('下課囉！老師辛苦了 🎉');speak('下課囉，大家今天表現得很棒');}
+};
+
+function renderStep(){
+  const st=curSteps[curStep];
+  document.getElementById('lpStepNo').textContent=(curStep+1)+' / '+curSteps.length;
+  document.getElementById('lpBarFill').style.width=((curStep+1)/curSteps.length*100)+'%';
+  document.getElementById('lpPrev').style.visibility=curStep===0?'hidden':'visible';
+  document.getElementById('lpNext').textContent=curStep===curSteps.length-1?'🎉 下課':'下一步 ➡';
+  const body=document.getElementById('lpBody');body.innerHTML='';
+  document.querySelector('.lpBody').scrollTop=0;
+  speechSynthesis&&speechSynthesis.cancel();
+
+  if(st.t==='intro'){
+    const L=PLAN[st.i];
+    body.innerHTML='<div class="stepTag">📋 今天要學什麼</div>'+
+      '<div class="card"><div style="margin-bottom:8px">'+L.syms.map(x=>'<span class="tag">'+x+'</span>').join('')+'</div>'+
+      '<div style="font-size:15px;line-height:1.8">🎯 '+L.goal+'</div>'+
+      '<div class="flow" style="margin-top:10px">'+L.flow.map(f=>'<div><b>'+f[0]+'</b><span>'+f[1]+'</span></div>').join('')+'</div></div>'+
+      '<div class="hintTxt">👩‍🏫 老師按「下一步」，網站會照順序帶大家上課！</div>';
+  }
+  else if(st.t==='tones'){
+    body.innerHTML='<div class="stepTag">🎵 暖身：聲調魔法</div>'+
+      '<div class="card"><div style="font-size:15px;line-height:1.8">同一個音，加上不同聲調，就變成不同的字！用最有名的「ㄇㄚ」家族試試看，點卡片聽聲音、跟著做手勢：</div>'+
+      '<div class="toneDemo" id="toneDemo"></div>'+
+      '<div class="storyBox" style="margin-top:14px"><div class="pic">🖐️</div><div><b>聲調手勢口訣：</b>一聲平平走、二聲往上爬、三聲打個勾、四聲溜滑梯、輕聲輕輕點一下。</div></div></div>';
+    const demo=[['ㄇㄚ','媽','一聲 —'],['ㄇㄚˊ','麻','二聲 ˊ'],['ㄇㄚˇ','馬','三聲 ˇ'],['ㄇㄚˋ','罵','四聲 ˋ'],['˙ㄇㄚ','嗎','輕聲 ˙']];
+    const box=body.querySelector('#toneDemo');
+    demo.forEach(([z,h,n])=>{
+      const b=document.createElement('button');b.className='toneCard';
+      b.innerHTML='<div class="tz">'+z+'</div><div class="th">'+h+'</div><div class="tn">'+n+'</div>';
+      b.onclick=()=>speak(h,0.6);
+      box.appendChild(b);
+    });
+  }
+  else if(st.t==='sym'){
+    const o=SYMS[st.i];
+    body.innerHTML='<div class="stepTag">✏️ 符號教學（'+(st.k+1)+'/'+st.n+'）</div>'+
+      '<div class="bigz">'+o.s+'</div>'+
+      '<div class="mrow"><button class="btn o" id="sSay">🔊 聽符號發音</button><button class="btn t" id="sWord">🔊 例詞「'+o.word+'」</button></div>'+
+      '<div class="storyBox"><div class="pic">'+o.pic+'</div><div><b>發音故事：</b>'+STORY[o.s]+
+      '<div style="font-size:13px;color:#8A97AE;margin-top:6px">💡 '+o.hint+'</div></div></div>'+
+      '<div class="mrow"><button class="btn g" id="sStory">🔊 唸故事給我聽</button></div>'+
+      '<div style="text-align:center;font-weight:900;margin-top:4px">✍️ 描描看</div>'+
+      '<canvas class="trace" id="sTrace" width="300" height="300"></canvas>'+
+      '<div class="mrow"><button class="btn w" id="sClear">🧽 擦掉重寫</button></div>';
+    body.querySelector('#sSay').onclick=()=>speakSym(o);
+    body.querySelector('#sWord').onclick=()=>speak(o.word.replace(/（.*）/,''),0.7);
+    body.querySelector('#sStory').onclick=()=>speak(STORY[o.s].replace(/[「」～！？。：、——]/g,'，'),0.85);
+    const reset=makeTrace(body.querySelector('#sTrace'),o.s);
+    body.querySelector('#sClear').onclick=reset;
+    setTimeout(()=>speakSym(o),250);
+  }
+  else if(st.t==='blend'){
+    body.innerHTML='<div class="stepTag">🚂 拼讀練習</div>'+
+      '<div class="card"><div style="font-size:15px;line-height:1.8">'+st.title+'</div><div class="blendList" id="bl"></div>'+
+      '<div class="note">想自由拼更多？下課後到「拼拼看」的拼音小火車繼續玩！</div></div>';
+    const box=body.querySelector('#bl');
+    st.items.forEach(([syl,t])=>{
+      const c=lookup(syl,t);
+      const b=document.createElement('button');b.className='blendItem';
+      b.innerHTML='<div class="bz">'+tonedZ(syl,t)+'</div><div class="bc">'+(c?('就是「'+c+'」'):'')+'</div>';
+      b.onclick=()=>{if(c)speak(c,0.6);else speak(tonedZ(syl,t),0.6);};
+      box.appendChild(b);
+    });
+  }
+  else if(st.t==='joined'){
+    body.innerHTML='<div class="stepTag">🌈 結合韻</div>'+
+      '<div class="card"><div style="font-size:15px;line-height:1.8">'+st.title+'</div>'+
+      '<div id="ljBanner"><div class="hintTxt">點一個結合韻，先聽聲音，再聽它的小故事 👇</div></div>'+
+      '<div class="jgrid" id="ljGrid" style="margin-top:10px"></div></div>';
+    buildJGrid(body.querySelector('#ljGrid'),body.querySelector('#ljBanner'),st.list||JOINED);
+  }
+  else if(st.t==='poem'){
+    body.innerHTML='<div class="stepTag">📖 唸課文</div>';
+    st.list.forEach(pi=>body.appendChild(buildPoemCard(pi)));
+  }
+  else if(st.t==='game'){
+    body.innerHTML='<div class="stepTag">🎮 闖關驗收</div>'+
+      '<div class="card" style="text-align:center"><div style="font-size:50px">🏁</div>'+
+      '<div style="font-size:16px;line-height:1.8;margin:10px 0">'+st.desc+'</div>'+
+      '<button class="btn p" id="goGame" style="font-size:18px">🎮 出發去闖關！</button>'+
+      '<div class="note">玩完遊戲後，回到「七堂課」再按「開始上課」，用上方進度條跳回這一步即可繼續。</div></div>';
+    const g=st.g;
+    body.querySelector('#goGame').onclick=()=>{lp.classList.remove('on');gotoPage('game');showGame(g);};
+  }
+  else if(st.t==='award'){
+    body.innerHTML='<div class="stepTag">🏅 頒獎時間</div>'+
+      '<div class="card awardBox"><div class="medal">🏅</div>'+
+      '<div style="font-size:24px;font-weight:900;margin:10px 0">恭喜完成七堂課！</div>'+
+      '<div style="font-size:16px;line-height:1.9">37 個注音符號、結合韻、聲調、課文通通學會了，<br>你是最棒的「注音小達人」！</div>'+
+      '<div class="mrow" style="margin-top:14px"><button class="btn o" id="cheer" style="font-size:18px">🎉 大聲歡呼</button></div></div>';
+    body.querySelector('#cheer').onclick=()=>speak('恭喜你完成七堂課，你是注音小達人，太棒了！',0.85);
+  }
+}
+
 </script>
 </body>
 </html>
