@@ -343,6 +343,16 @@ function speak(text,rate){
   u.rate=rate||0.8; u.pitch=1.1;
   speechSynthesis.speak(u);
 }
+
+/* 智慧唸國字：三聲特別處理，避免引擎把曲線唸壞 */
+function isTone3(z){return z&&z.indexOf('ˇ')>=0;}
+function speakChar(ch,zy,rate){
+  if(!ch){speak(zy||ch,0.8);return;}
+  // 三聲：複誦一次，幫引擎拉出完整的「先降後升」
+  if(zy&&isTone3(zy)){speak(ch+'，'+ch,rate||0.78);return;}
+  speak(ch,rate||0.8);
+}
+
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');clearTimeout(t._tm);t._tm=setTimeout(()=>t.classList.remove('on'),1600);}
 
 /* 符號發音：z=直接唸注音符號（多數zh-TW引擎支援呼讀音），c=用國字示範 */
@@ -631,11 +641,11 @@ function goTrain(){
   const c=lookup(syl,selT);
   if(c){
     document.getElementById('resC').textContent='就是「'+c+'」的音！🎉';
-    speak(c,0.7);
+    speakChar(c,tonedZ(syl,selT),0.8);
   }else if(D[syl]){
     document.getElementById('resC').textContent='這個聲調沒有常用的國字，換個聲調試試！';
     const any=[1,2,3,4,5].find(t=>lookup(syl,t));
-    if(any)speak(lookup(syl,any),0.7);
+    if(any)speakChar(lookup(syl,any),tonedZ(syl,any),0.8);
   }else{
     document.getElementById('resC').textContent='這個組合不常見喔，換一節車廂試試！🚂';
     toast('換個組合試試看！');
@@ -686,8 +696,8 @@ const JINFO={
 };
 function speakJoined(j){
   const info=JINFO[j];
-  if(info)speak(info[1],0.6);
-  else{const t=[1,2,3,4].find(t=>lookup(j,t));t?speak(lookup(j,t),0.6):speak(j,0.6);}
+  if(info){const t=[3,2,1,4].find(t=>lookup(j,t)===info[1]);speakChar(info[1],tonedZ(j,t||1),0.8);}
+  else{const t=[1,2,3,4].find(t=>lookup(j,t));t?speakChar(lookup(j,t),tonedZ(j,t),0.8):speak(j,0.8);}
 }
 function jStoryHTML(j){
   const [pic,ex,story]=JINFO[j];
@@ -750,7 +760,7 @@ function buildPoemCard(pi){
       if(!zy){sy.style.cursor='default';sy.style.background='transparent';sy.innerHTML='<div class="zy">&nbsp;</div><div class="hz">'+hz+'</div>';}
       else{
         sy.innerHTML='<div class="zy">'+zy+'</div><div class="hz">'+hz+'</div>';
-        sy.onclick=()=>{speak(hz,0.6);sy.classList.add('lit');setTimeout(()=>sy.classList.remove('lit'),600);};
+        sy.onclick=()=>{speakChar(hz,zy,0.78);sy.classList.add('lit');setTimeout(()=>sy.classList.remove('lit'),600);};
       }
       lp2.appendChild(sy);
     });
@@ -1063,7 +1073,7 @@ function renderStep(){
     demo.forEach(([z,h,n])=>{
       const b=document.createElement('button');b.className='toneCard';
       b.innerHTML='<div class="tz">'+z+'</div><div class="th">'+h+'</div><div class="tn">'+n+'</div>';
-      b.onclick=()=>speak(h,0.6);
+      b.onclick=()=>speakChar(h,z,0.8);
       box.appendChild(b);
     });
   }
@@ -1094,7 +1104,7 @@ function renderStep(){
       const c=lookup(syl,t);
       const b=document.createElement('button');b.className='blendItem';
       b.innerHTML='<div class="bz">'+tonedZ(syl,t)+'</div><div class="bc">'+(c?('就是「'+c+'」'):'')+'</div>';
-      b.onclick=()=>{if(c)speak(c,0.6);else speak(tonedZ(syl,t),0.6);};
+      b.onclick=()=>{if(c)speakChar(c,tonedZ(syl,t),0.78);else speak(tonedZ(syl,t),0.78);};
       box.appendChild(b);
     });
   }
