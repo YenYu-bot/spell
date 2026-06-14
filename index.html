@@ -636,7 +636,6 @@ function openModal(i){
   document.getElementById('mStory').innerHTML='<b>發音故事：</b>'+STORY[o.s];
   modal.classList.add('on');
   resetTrace();
-  speakSym(o);
 }
 document.getElementById('mclose').onclick=()=>modal.classList.remove('on');
 modal.onclick=e=>{if(e.target===modal)modal.classList.remove('on');};
@@ -1183,7 +1182,7 @@ function renderStep(){
     body.querySelector('#sHanlin').onclick=()=>playHanlin(o.s);
     const reset=makeTrace(body.querySelector('#sTrace'),o.s);
     body.querySelector('#sClear').onclick=reset;
-    setTimeout(()=>speakSym(o),250);
+    /* 不再自動播放 TTS，請點按鈕主動播放 */
   }
   else if(st.t==='blend'){
     body.innerHTML='<div class="stepTag">🚂 拼讀練習</div>'+
