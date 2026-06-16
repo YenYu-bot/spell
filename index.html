@@ -131,6 +131,39 @@ footer{text-align:center;font-size:12px;color:#8A97AE;padding:20px}
   .opt{width:72px;height:72px;font-size:36px}
 }
 
+
+/* 小一遊戲樣式 */
+.scoreBar{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:8px 0}
+.bigSym{font-family:var(--kai);font-size:130px;text-align:center;line-height:1.1;margin:14px 0;color:var(--ink);min-height:140px}
+.bigSym.small{font-size:90px;min-height:100px}
+.progBar{background:#FFF7E5;padding:12px;text-align:center}
+.progBtn{border:none;cursor:pointer;font-family:var(--body);font-weight:800;font-size:13px;
+  padding:8px 12px;border-radius:14px;background:#fff;color:var(--ink);
+  box-shadow:0 2px 0 var(--line);margin:2px}
+.progBtn.on{background:var(--orange);color:#fff;box-shadow:0 2px 0 var(--orange-d)}
+.endMsg{text-align:center;font-family:var(--kai);font-size:22px;line-height:1.8;padding:20px;color:var(--ink)}
+.endMsg b{color:var(--orange);font-size:32px}
+.audioBtn{font-size:28px;padding:14px 28px;border-radius:50px}
+/* 動物歡呼動畫 */
+.cheer{position:fixed;left:50%;top:40%;text-align:center;pointer-events:none;z-index:1000;
+  animation:cheerPop 1.4s ease-out forwards;transform:translate(-50%,-50%)}
+.cheer .animal{font-size:90px;animation:cheerWave 0.5s ease-in-out infinite;display:inline-block;filter:drop-shadow(0 4px 8px rgba(0,0,0,.2))}
+.cheer .msg{background:var(--yellow);border-radius:24px;padding:10px 24px;
+  font-family:var(--kai);font-size:28px;font-weight:900;color:var(--orange-d);
+  box-shadow:0 5px 0 #d9ab12;margin-top:10px;display:inline-block;white-space:nowrap}
+@keyframes cheerPop{
+  0%{opacity:0;transform:translate(-50%,-20%) scale(0.4)}
+  20%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}
+  40%{transform:translate(-50%,-50%) scale(1)}
+  80%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+  100%{opacity:0;transform:translate(-50%,-90%) scale(0.8)}
+}
+@keyframes cheerWave{0%,100%{transform:rotate(-12deg)}50%{transform:rotate(12deg)}}
+/* 氣餒小動物（答錯時溫和提示） */
+.gentle{position:fixed;left:50%;top:50%;text-align:center;pointer-events:none;z-index:1000;
+  animation:gentleFloat 1s ease-out forwards;transform:translate(-50%,-50%);font-size:50px}
+@keyframes gentleFloat{0%{opacity:0;transform:translate(-50%,-30%) scale(0.5)}30%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-60%) scale(0.9)}}
+
 /* 上課模式 */
 .lp{position:fixed;inset:0;background:var(--sky);z-index:120;display:none;flex-direction:column}
 .lp.on{display:flex}
@@ -248,39 +281,63 @@ footer{text-align:center;font-size:12px;color:#8A97AE;padding:20px}
 
 <!-- ================= 遊戲 ================= -->
 <section id="pg-game" class="page">
-  <h2 class="sec">🎮 互動小遊戲</h2>
+  <h2 class="sec">🎮 注音小遊戲</h2>
+
+  <div class="card progBar">
+    <div style="font-weight:900;margin-bottom:8px">📚 練習範圍（跟著上課進度）</div>
+    <div id="progBtns">
+      <button class="progBtn" data-prog="1">第 1 堂<br><span style="font-weight:400;font-size:11px">8 個韻母</span></button>
+      <button class="progBtn" data-prog="2">第 2 堂<br><span style="font-weight:400;font-size:11px">16 個</span></button>
+      <button class="progBtn" data-prog="3">第 3 堂<br><span style="font-weight:400;font-size:11px">24 個</span></button>
+      <button class="progBtn" data-prog="4">第 4 堂<br><span style="font-weight:400;font-size:11px">30 個</span></button>
+      <button class="progBtn" data-prog="5">第 5 堂<br><span style="font-weight:400;font-size:11px">37 個全部</span></button>
+      <button class="progBtn on" data-prog="all">自由模式<br><span style="font-weight:400;font-size:11px">含結合韻</span></button>
+    </div>
+  </div>
+
   <div class="subTabs">
-    <button class="btn t" data-g="g1">👂 聽音找符號</button>
-    <button class="btn g" data-g="g2">🃏 配對翻翻樂</button>
-    <button class="btn p" data-g="g3">🎈 氣球大作戰</button>
+    <button class="btn t" data-g="g1">👀 找一樣</button>
+    <button class="btn g" data-g="g2">🐱 找好朋友</button>
+    <button class="btn p" data-g="g3">👂 聽一聽</button>
   </div>
 
   <div class="card gWrap" id="g1" style="display:none">
-    <h3>👂 聽音找符號</h3>
-    <p style="margin:6px 0;font-size:14px;color:#6B7A99">聽聽看是哪個注音符號的聲音，從四個選項中找出來！</p>
-    <span class="score">得分：<span id="g1score">0</span></span>
-    <span class="score">連對：<span id="g1streak">0</span> 🔥</span>
-    <div class="mrow"><button class="btn o" id="g1play">🔊 再聽一次</button></div>
-    <div class="opts" id="g1opts"></div>
-    <button class="btn t" id="g1start">開始遊戲</button>
+    <h3>👀 找一樣的注音</h3>
+    <p style="margin:6px 0;font-size:14px;color:#6B7A99">看上面大大的注音，從下面找出一模一樣的那一個！</p>
+    <div class="scoreBar">
+      <span class="score">第 <span id="g1r">0</span> / 10 題</span>
+      <span class="score">答對：<span id="g1s">0</span> 🌟</span>
+    </div>
+    <div id="g1Target" class="bigSym">？</div>
+    <div class="opts" id="g1Opts"></div>
+    <button class="btn t" id="g1Start" style="font-size:18px">▶ 開始遊戲</button>
   </div>
 
   <div class="card gWrap" id="g2" style="display:none">
-    <h3>🃏 配對翻翻樂</h3>
-    <p style="margin:6px 0;font-size:14px;color:#6B7A99">把注音符號和它的圖案好朋友配成對！（例如 ㄇ ↔ 🐱貓）</p>
-    <span class="score">步數：<span id="g2moves">0</span></span>
-    <div class="memGrid" id="g2grid"></div>
-    <button class="btn g" id="g2start">重新洗牌</button>
+    <h3>🐱 找注音的好朋友</h3>
+    <p style="margin:6px 0;font-size:14px;color:#6B7A99">這個注音的好朋友圖案是哪一個呢？（要記得我們的小故事喔！）</p>
+    <div class="scoreBar">
+      <span class="score">第 <span id="g2r">0</span> / 10 題</span>
+      <span class="score">答對：<span id="g2s">0</span> 🌟</span>
+    </div>
+    <div id="g2Target" class="bigSym">？</div>
+    <div class="opts" id="g2Opts"></div>
+    <button class="btn g" id="g2Start" style="font-size:18px">▶ 開始遊戲</button>
   </div>
 
   <div class="card gWrap" id="g3" style="display:none">
-    <h3>🎈 氣球大作戰</h3>
-    <p style="margin:6px 0;font-size:14px;color:#6B7A99">看圖聽單字，戳破「開頭注音」的氣球！共 10 題。</p>
-    <span class="score">得分：<span id="g3score">0</span></span>
-    <span class="score">第 <span id="g3round">0</span> / 10 題</span>
-    <div class="target"><span class="big-emoji" id="g3emoji">🎈</span><div id="g3word" style="font-size:22px"></div></div>
-    <div class="mrow"><button class="btn o" id="g3play">🔊 再聽一次</button><button class="btn p" id="g3start">開始遊戲</button></div>
-    <div class="sea" id="g3sea"></div>
+    <h3>👂 聽一聽，找出來</h3>
+    <p style="margin:6px 0;font-size:14px;color:#6B7A99">按「再聽一次」聽老師唸發音，再點下面對應的注音！</p>
+    <div class="scoreBar">
+      <span class="score">第 <span id="g3r">0</span> / 10 題</span>
+      <span class="score">答對：<span id="g3s">0</span> 🌟</span>
+    </div>
+    <video id="g3Audio" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" playsinline></video>
+    <div style="text-align:center;margin:20px 0">
+      <button class="btn o audioBtn" id="g3Play">🔊 再聽一次</button>
+    </div>
+    <div class="opts" id="g3Opts"></div>
+    <button class="btn p" id="g3Start" style="font-size:18px">▶ 開始遊戲</button>
   </div>
 </section>
 </main>
@@ -873,133 +930,186 @@ function playPoem(pi){
 document.querySelectorAll('[data-g]').forEach(b=>{
   b.onclick=()=>{
     ['g1','g2','g3'].forEach(g=>document.getElementById(g).style.display=(g===b.dataset.g)?'block':'none');
+    document.querySelectorAll('[data-g]').forEach(x=>x.classList.toggle('on',x===b));
   };
 });
 document.getElementById('g1').style.display='block';
+document.querySelector('[data-g="g1"]').classList.add('on');
 
-/* 遊戲1：聽音找符號 */
-let g1ans=null,g1score=0,g1streak=0;
-function g1round(){
-  const pool=[...SYMS];
-  const correct=pool[Math.floor(Math.random()*pool.length)];
-  g1ans=correct;
-  const opts=[correct];
-  while(opts.length<4){
-    const c=pool[Math.floor(Math.random()*pool.length)];
-    if(!opts.includes(c))opts.push(c);
+/* ========== 進度選擇 ========== */
+const LESSON_SYMS=[
+ ['ㄚ','ㄛ','ㄜ','ㄝ','ㄞ','ㄟ','ㄠ','ㄡ'],
+ ['ㄢ','ㄣ','ㄤ','ㄥ','ㄦ','ㄧ','ㄨ','ㄩ'],
+ ['ㄅ','ㄆ','ㄇ','ㄈ','ㄉ','ㄊ','ㄋ','ㄌ'],
+ ['ㄍ','ㄎ','ㄏ','ㄐ','ㄑ','ㄒ'],
+ ['ㄓ','ㄔ','ㄕ','ㄖ','ㄗ','ㄘ','ㄙ']
+];
+let activeProg='all';
+function activePool(){
+  if(activeProg==='all')return SYMS;
+  const n=parseInt(activeProg);
+  const allowed=new Set();
+  for(let i=0;i<n;i++)LESSON_SYMS[i].forEach(s=>allowed.add(s));
+  return SYMS.filter(o=>allowed.has(o.s));
+}
+function setActiveProg(p){
+  activeProg=p;
+  document.querySelectorAll('.progBtn').forEach(b=>b.classList.toggle('on',b.dataset.prog===p));
+}
+document.querySelectorAll('.progBtn').forEach(b=>{
+  b.onclick=()=>{setActiveProg(b.dataset.prog);toast('範圍已切換，按「開始遊戲」重玩 🎮');};
+});
+
+/* ========== 可愛動物歡呼 ========== */
+const CHEER_ANIMALS=['🐰','🐶','🐱','🐻','🦊','🐼','🐯','🦁','🐵','🐨','🐹','🐮'];
+const CHEER_MSGS=['好棒','答對了','你真聰明','繼續加油','太厲害','哇～對了','好聰明','答得真好'];
+function cheer(){
+  const a=CHEER_ANIMALS[Math.floor(Math.random()*CHEER_ANIMALS.length)];
+  const m=CHEER_MSGS[Math.floor(Math.random()*CHEER_MSGS.length)];
+  const el=document.createElement('div');el.className='cheer';
+  el.innerHTML='<div class="animal">'+a+'</div><div class="msg">'+m+'！</div>';
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),1400);
+}
+function gentle(){
+  const el=document.createElement('div');el.className='gentle';
+  el.textContent='🤔';
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),900);
+}
+
+/* ========== 通用：產生隨機題目 ========== */
+function pickOpts(target,n,pool){
+  const opts=[target];
+  const work=pool.length>=n?pool:SYMS;
+  let tries=0;
+  while(opts.length<n && tries<200){
+    tries++;
+    const c=work[Math.floor(Math.random()*work.length)];
+    if(!opts.find(o=>o.s===c.s))opts.push(c);
   }
-  opts.sort(()=>Math.random()-.5);
-  const box=document.getElementById('g1opts');box.innerHTML='';
+  return opts.sort(()=>Math.random()-0.5);
+}
+function endScreen(targetEl,optsEl,right,total,restart){
+  const e=right>=Math.ceil(total*0.9)?'🏆':right>=Math.ceil(total*0.7)?'🌟':right>=Math.ceil(total*0.5)?'👍':'🤗';
+  targetEl.textContent=e;
+  optsEl.innerHTML='<div class="endMsg">'+total+' 題答對 <b>'+right+'</b> 題！<br>'+
+    (right>=total*0.8?'你是注音小達人 🎉':right>=total*0.5?'繼續加油，下次更厲害！':'多玩幾次就會超棒！')+'</div>';
+}
+
+/* ========== Game 1: 找一樣 ========== */
+const G1_TOTAL=10;
+let g1Round=0,g1Right=0,g1Target=null;
+function g1Begin(){
+  g1Round=0;g1Right=0;
+  document.getElementById('g1Start').textContent='重新開始';
+  g1Next();
+}
+function g1Next(){
+  g1Round++;
+  document.getElementById('g1r').textContent=g1Round;
+  document.getElementById('g1s').textContent=g1Right;
+  if(g1Round>G1_TOTAL){
+    endScreen(document.getElementById('g1Target'),document.getElementById('g1Opts'),g1Right,G1_TOTAL);
+    return;
+  }
+  const pool=activePool();
+  g1Target=pool[Math.floor(Math.random()*pool.length)];
+  document.getElementById('g1Target').textContent=g1Target.s;
+  const opts=pickOpts(g1Target,4,pool);
+  const box=document.getElementById('g1Opts');box.innerHTML='';
   opts.forEach(o=>{
     const b=document.createElement('button');b.className='opt';b.textContent=o.s;
     b.onclick=()=>{
-      if(o===g1ans){
-        b.classList.add('good');g1score++;g1streak++;
-        toast(g1streak>=3?'連對 '+g1streak+' 題，太厲害了！🔥':'答對了！🎉');
-        speak('答對了');
-        setTimeout(g1round,900);
-      }else{
-        b.classList.add('bad');g1streak=0;
-        toast('再聽一次，加油！');speakSym(g1ans);
-      }
-      document.getElementById('g1score').textContent=g1score;
-      document.getElementById('g1streak').textContent=g1streak;
-    };
-    box.appendChild(b);
-  });
-  setTimeout(()=>speakSym(correct),300);
-}
-document.getElementById('g1start').onclick=()=>{g1score=0;g1streak=0;document.getElementById('g1score').textContent=0;document.getElementById('g1streak').textContent=0;g1round();};
-document.getElementById('g1play').onclick=()=>{if(g1ans)speakSym(g1ans);else toast('先按「開始遊戲」！');};
-
-/* 遊戲2：配對翻翻樂 */
-let g2open=[],g2lock=false,g2moves=0,g2done=0;
-function g2start(){
-  g2open=[];g2lock=false;g2moves=0;g2done=0;
-  document.getElementById('g2moves').textContent=0;
-  const picks=[...SYMS].sort(()=>Math.random()-.5).slice(0,6);
-  let cards=[];
-  picks.forEach((o,i)=>{cards.push({k:i,txt:o.s,o});cards.push({k:i,txt:o.pic,o});});
-  cards.sort(()=>Math.random()-.5);
-  const box=document.getElementById('g2grid');box.innerHTML='';
-  cards.forEach(c=>{
-    const b=document.createElement('button');b.className='mem';b.textContent='？';
-    b.onclick=()=>{
-      if(g2lock||b.classList.contains('open')||b.classList.contains('done'))return;
-      b.textContent=c.txt;b.classList.add('open');
-      g2open.push({b,c});
-      if(g2open.length===2){
-        g2moves++;document.getElementById('g2moves').textContent=g2moves;
-        g2lock=true;
-        const [a,d]=g2open;
-        if(a.c.k===d.c.k){
-          setTimeout(()=>{
-            a.b.classList.add('done');d.b.classList.add('done');
-            a.b.classList.remove('open');d.b.classList.remove('open');
-            speak(a.c.o.word.replace(/[（）「」]/g,''),0.75);
-            g2open=[];g2lock=false;g2done++;
-            if(g2done===6){toast('全部配對成功！🏆');speak('太棒了，全部配對成功');}
-          },450);
-        }else{
-          setTimeout(()=>{
-            a.b.textContent='？';d.b.textContent='？';
-            a.b.classList.remove('open');d.b.classList.remove('open');
-            g2open=[];g2lock=false;
-          },800);
-        }
-      }
+      if(o.s===g1Target.s){b.classList.add('good');g1Right++;cheer();setTimeout(g1Next,1100);}
+      else{b.classList.add('bad');gentle();setTimeout(()=>b.classList.remove('bad'),500);}
     };
     box.appendChild(b);
   });
 }
-document.getElementById('g2start').onclick=g2start;
-g2start();
+document.getElementById('g1Start').onclick=g1Begin;
 
-/* 遊戲3：氣球大作戰 */
-const BALCOLORS=['#FF6B8A','#2EC4B6','#7B5EA7','#FF8A3D','#5BA8F5','#E8B931'];
-let g3target=null,g3score=0,g3roundN=0;
-function g3newRound(){
-  if(g3roundN>=10){
-    toast('遊戲結束！得分 '+g3score+' 分 🏅');
-    speak(g3score>=8?'恭喜過關，你是注音小達人':'再玩一次，會更厲害喔');
+/* ========== Game 2: 找好朋友（注音 → 圖案） ========== */
+const G2_TOTAL=10;
+let g2Round=0,g2Right=0,g2Target=null;
+function g2Begin(){
+  g2Round=0;g2Right=0;
+  document.getElementById('g2Start').textContent='重新開始';
+  g2Next();
+}
+function g2Next(){
+  g2Round++;
+  document.getElementById('g2r').textContent=g2Round;
+  document.getElementById('g2s').textContent=g2Right;
+  if(g2Round>G2_TOTAL){
+    endScreen(document.getElementById('g2Target'),document.getElementById('g2Opts'),g2Right,G2_TOTAL);
     return;
   }
-  g3roundN++;
-  document.getElementById('g3round').textContent=g3roundN;
-  const initialsOnly=SYMS.filter(o=>o.cat==='b');
-  g3target=initialsOnly[Math.floor(Math.random()*initialsOnly.length)];
-  document.getElementById('g3emoji').textContent=g3target.pic;
-  document.getElementById('g3word').textContent=g3target.word.replace(/[（）「」]/g,'')+'，開頭是哪個注音？';
-  speak(g3target.word.replace(/[（）「」]/g,''),0.75);
-  const sea=document.getElementById('g3sea');sea.innerHTML='';
-  const opts=[g3target];
-  while(opts.length<6){
+  const pool=activePool();
+  g2Target=pool[Math.floor(Math.random()*pool.length)];
+  document.getElementById('g2Target').textContent=g2Target.s;
+  // 從整個 SYMS 池中找與 target 圖案不同的干擾
+  const opts=[g2Target];
+  let tries=0;
+  while(opts.length<4 && tries<200){
+    tries++;
     const c=SYMS[Math.floor(Math.random()*SYMS.length)];
-    if(!opts.includes(c))opts.push(c);
+    if(!opts.find(o=>o.pic===c.pic))opts.push(c);
   }
-  opts.sort(()=>Math.random()-.5);
-  opts.forEach((o,i)=>{
-    const b=document.createElement('button');b.className='bal';b.textContent=o.s;
-    b.style.background=BALCOLORS[i%BALCOLORS.length];
-    b.style.left=(6+ (i%3)*31 + Math.random()*4)+'%';
-    b.style.top=(i<3? 8+Math.random()*12 : 52+Math.random()*14)+'%';
-    b.style.animationDelay=(Math.random()*2)+'s';
+  opts.sort(()=>Math.random()-0.5);
+  const box=document.getElementById('g2Opts');box.innerHTML='';
+  opts.forEach(o=>{
+    const b=document.createElement('button');b.className='opt';b.style.fontSize='50px';
+    b.textContent=o.pic;
     b.onclick=()=>{
-      if(o===g3target){
-        g3score++;document.getElementById('g3score').textContent=g3score;
-        b.style.transform='scale(1.6)';b.style.opacity='0';
-        toast('砰！答對了 🎉');
-        setTimeout(g3newRound,800);
-      }else{
-        toast('不是這顆，再聽一次！');
-        speak(g3target.word.replace(/[（）「」]/g,''),0.75);
-      }
+      if(o.s===g2Target.s){b.classList.add('good');g2Right++;cheer();setTimeout(g2Next,1100);}
+      else{b.classList.add('bad');gentle();setTimeout(()=>b.classList.remove('bad'),500);}
     };
-    sea.appendChild(b);
+    box.appendChild(b);
   });
 }
-document.getElementById('g3start').onclick=()=>{g3score=0;g3roundN=0;document.getElementById('g3score').textContent=0;g3newRound();};
-document.getElementById('g3play').onclick=()=>{if(g3target)speak(g3target.word.replace(/[（）「」]/g,''),0.75);else toast('先按「開始遊戲」！');};
+document.getElementById('g2Start').onclick=g2Begin;
+
+/* ========== Game 3: 聽一聽（翰林真人發音） ========== */
+const G3_TOTAL=10;
+let g3Round=0,g3Right=0,g3Target=null;
+function g3Begin(){
+  g3Round=0;g3Right=0;
+  document.getElementById('g3Start').textContent='重新開始';
+  g3Next();
+}
+function g3Next(){
+  g3Round++;
+  document.getElementById('g3r').textContent=g3Round;
+  document.getElementById('g3s').textContent=g3Right;
+  if(g3Round>G3_TOTAL){
+    document.getElementById('g3Opts').innerHTML='<div class="endMsg">'+G3_TOTAL+' 題答對 <b>'+g3Right+'</b> 題！<br>'+
+      (g3Right>=G3_TOTAL*0.8?'你的耳朵超棒！🎉':g3Right>=G3_TOTAL*0.5?'再聽幾次就更熟囉！':'多玩幾次，耳朵會越來越靈！')+'</div>';
+    return;
+  }
+  const pool=activePool();
+  g3Target=pool[Math.floor(Math.random()*pool.length)];
+  const opts=pickOpts(g3Target,4,pool);
+  const box=document.getElementById('g3Opts');box.innerHTML='';
+  opts.forEach(o=>{
+    const b=document.createElement('button');b.className='opt';b.textContent=o.s;
+    b.onclick=()=>{
+      if(o.s===g3Target.s){b.classList.add('good');g3Right++;cheer();setTimeout(g3Next,1100);}
+      else{b.classList.add('bad');gentle();setTimeout(()=>{b.classList.remove('bad');g3PlayAudio();},500);}
+    };
+    box.appendChild(b);
+  });
+  setTimeout(g3PlayAudio,200);
+}
+function g3PlayAudio(){
+  if(!g3Target)return;
+  const url=hanlinVideoUrl(g3Target.s);
+  const v=document.getElementById('g3Audio');
+  if(url){v.src=url;v.load();v.play().catch(()=>speakSym(g3Target));}
+  else speakSym(g3Target);
+}
+document.getElementById('g3Start').onclick=g3Begin;
+document.getElementById('g3Play').onclick=g3PlayAudio;
 
 /* ============ 37 個符號的發音故事 ============ */
 const STORY={
@@ -1076,28 +1186,28 @@ const LDEF=[
  {syms:['ㄚ','ㄛ','ㄜ','ㄝ','ㄞ','ㄟ','ㄠ','ㄡ'],
   pre:[{t:'tones'}],
   post:[{t:'blend',title:'單韻母配聲調，點一點唸唸看！',items:[['ㄚ',1],['ㄜ',2],['ㄜ',4],['ㄞ',1],['ㄞ',3],['ㄞ',4],['ㄠ',1],['ㄠ',2],['ㄡ',1],['ㄡ',3]]},
-        {t:'game',g:'g1',desc:'聽聲音，找出今天學的符號！連對 5 題就過關 🏁'}]},
+        {t:'game',g:'g1',desc:'找出和上面一樣的注音符號！答對 8 題以上就過關 🏁'}]},
  {syms:['ㄢ','ㄣ','ㄤ','ㄥ','ㄦ','ㄧ','ㄨ','ㄩ'],
   post:[{t:'joined',list:['ㄧㄚ','ㄧㄝ','ㄧㄡ','ㄨㄚ','ㄨㄛ','ㄨㄟ','ㄩㄝ','ㄩㄢ'],title:'結合韻初體驗：兩個好朋友手牽手'},
-        {t:'game',g:'g2',desc:'把符號和圖案配成對，全部配完就過關 🏁'}]},
+        {t:'game',g:'g2',desc:'找出每個注音的好朋友圖案！答對 8 題以上就過關 🏁'}]},
  {syms:['ㄅ','ㄆ','ㄇ','ㄈ','ㄉ','ㄊ','ㄋ','ㄌ'],
   post:[{t:'blend',title:'兩拼小火車：聲母＋韻母，碰在一起變什麼字？',items:[['ㄅㄚ',1],['ㄅㄚ',4],['ㄆㄚ',2],['ㄇㄚ',1],['ㄇㄚ',3],['ㄈㄢ',4],['ㄉㄚ',3],['ㄊㄨ',4],['ㄋㄞ',3],['ㄌㄠ',3]]},
-        {t:'game',g:'g3',desc:'聽單字，戳破開頭注音的氣球！8 分以上過關 🏁'}]},
+        {t:'game',g:'g3',desc:'聽真人發音，找出對應的注音！答對 8 題以上就過關 🏁'}]},
  {syms:['ㄍ','ㄎ','ㄏ','ㄐ','ㄑ','ㄒ'],
   post:[{t:'blend',title:'三拼挑戰：聲母＋介音＋韻母',items:[['ㄍㄨㄚ',1],['ㄍㄨㄛ',3],['ㄎㄨㄞ',4],['ㄏㄨㄚ',1],['ㄐㄧㄚ',1],['ㄐㄧㄠ',3],['ㄑㄧㄡ',2],['ㄒㄧㄠ',3],['ㄒㄩㄝ',2]]},
-        {t:'game',g:'g3',desc:'氣球大作戰！聽單字找開頭注音 🏁'}]},
+        {t:'game',g:'g3',desc:'聽真人發音找注音！答對 8 題以上就過關 🏁'}]},
  {syms:['ㄓ','ㄔ','ㄕ','ㄖ','ㄗ','ㄘ','ㄙ'],
   post:[{t:'blend',title:'翹舌 vs 平舌，仔細聽哪裡不一樣？',items:[['ㄓ',1],['ㄗ',1],['ㄕ',1],['ㄙ',1],['ㄔ',1],['ㄘ',2],['ㄖ',4],['ㄓㄨ',1],['ㄕㄨ',1],['ㄗㄨㄛ',4]]},
-        {t:'game',g:'g1',desc:'聽音找符號（小心混淆音！）連對 5 題過關 🏁'}]},
+        {t:'game',g:'g1',desc:'聽真人發音找注音（小心混淆音！）答對 8 題以上 🏁'}]},
  {syms:[],
   pre:[{t:'joined',list:null,title:'22 個結合韻總動員（點一點，每個都有故事）'},
        {t:'blend',title:'三拼總練習',items:[['ㄒㄧㄤ',1],['ㄋㄧㄡ',2],['ㄑㄩㄢ',2],['ㄌㄧㄤ',4],['ㄊㄧㄠ',4],['ㄍㄨㄟ',1],['ㄏㄨㄟ',2],['ㄐㄩㄝ',2]]},
        {t:'poem',list:[0,1]}],
-  post:[{t:'game',g:'g2',desc:'配對翻翻樂驗收！'}]},
+  post:[{t:'game',g:'g2',desc:'找好朋友圖案，總複習！'}]},
  {syms:[],
   pre:[{t:'poem',list:[2]},
-       {t:'game',g:'g1',desc:'第一關：聽音找符號，連對 5 題！'},
-       {t:'game',g:'g3',desc:'第二關：氣球大作戰，8 分以上！'}],
+       {t:'game',g:'g1',desc:'第一關：找一樣的注音，答對 8 題！'},
+       {t:'game',g:'g3',desc:'第二關：聽真人發音找注音，答對 8 題！'}],
   post:[{t:'award'}]}
 ];
 function buildSteps(i){
@@ -1216,7 +1326,13 @@ function renderStep(){
       '<button class="btn p" id="goGame" style="font-size:18px">🎮 出發去闖關！</button>'+
       '<div class="note">玩完遊戲後，回到「七堂課」再按「開始上課」，用上方進度條跳回這一步即可繼續。</div></div>';
     const g=st.g;
-    body.querySelector('#goGame').onclick=()=>{lp.classList.remove('on');gotoPage('game');showGame(g);};
+    body.querySelector('#goGame').onclick=()=>{
+      lp.classList.remove('on');
+      // 自動依當堂進度設定遊戲範圍
+      const lessonProg=['1','2','3','4','5','all','all'];
+      setActiveProg(lessonProg[curLesson]||'all');
+      gotoPage('game');showGame(g);
+    };
   }
   else if(st.t==='award'){
     body.innerHTML='<div class="stepTag">🏅 頒獎時間</div>'+
