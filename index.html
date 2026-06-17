@@ -297,7 +297,7 @@ footer{text-align:center;font-size:12px;color:#8A97AE;padding:20px}
 
   <div class="subTabs">
     <button class="btn t" data-g="g1">👀 找一樣</button>
-    <button class="btn g" data-g="g2">🐱 找好朋友</button>
+    <button class="btn g" data-g="g2">🎵 找聲調</button>
     <button class="btn p" data-g="g3">👂 聽一聽</button>
   </div>
 
@@ -314,13 +314,16 @@ footer{text-align:center;font-size:12px;color:#8A97AE;padding:20px}
   </div>
 
   <div class="card gWrap" id="g2" style="display:none">
-    <h3>🐱 找注音的好朋友</h3>
-    <p style="margin:6px 0;font-size:14px;color:#6B7A99">這個注音的好朋友圖案是哪一個呢？（要記得我們的小故事喔！）</p>
+    <h3>🎵 找聲調</h3>
+    <p style="margin:6px 0;font-size:14px;color:#6B7A99">看一看上面注音的聲調符號（橘色那個），找出對的聲調！</p>
     <div class="scoreBar">
       <span class="score">第 <span id="g2r">0</span> / 10 題</span>
       <span class="score">答對：<span id="g2s">0</span> 🌟</span>
     </div>
     <div id="g2Target" class="bigSym">？</div>
+    <div style="text-align:center;margin:8px 0">
+      <button class="btn o" id="g2Play" style="font-size:15px;padding:8px 18px">🔊 再聽一次</button>
+    </div>
     <div class="opts" id="g2Opts"></div>
     <button class="btn g" id="g2Start" style="font-size:18px">▶ 開始遊戲</button>
   </div>
@@ -1029,9 +1032,35 @@ function g1Next(){
 }
 document.getElementById('g1Start').onclick=g1Begin;
 
-/* ========== Game 2: 找好朋友（注音 → 圖案） ========== */
+/* ========== Game 2: 找聲調 ========== */
 const G2_TOTAL=10;
-let g2Round=0,g2Right=0,g2Target=null;
+let g2Round=0,g2Right=0,g2TargetTone=null,g2TargetChar=null;
+function g2GenQ(){
+  const pool=activePool();
+  const yun=pool.filter(o=>o.cat==='y'||o.cat==='j');
+  const sheng=pool.filter(o=>o.cat==='b');
+  for(let i=0;i<80;i++){
+    let syl;
+    if(sheng.length>0 && yun.length>0 && Math.random()>0.35){
+      syl=sheng[Math.floor(Math.random()*sheng.length)].s
+         +yun[Math.floor(Math.random()*yun.length)].s;
+    } else if(yun.length>0){
+      syl=yun[Math.floor(Math.random()*yun.length)].s;
+    } else {
+      syl=pool[Math.floor(Math.random()*pool.length)].s;
+    }
+    const entry=D[syl];
+    if(!entry) continue;
+    const valid=[];
+    for(let t=1;t<=4;t++){
+      if(entry[t-1] && entry[t-1]!=='-') valid.push(t);
+    }
+    if(valid.length===0) continue;
+    const tone=valid[Math.floor(Math.random()*valid.length)];
+    return {syl,tone,char:entry[tone-1]};
+  }
+  return {syl:'ㄚ',tone:1,char:'啊'};
+}
 function g2Begin(){
   g2Round=0;g2Right=0;
   document.getElementById('g2Start').textContent='重新開始';
@@ -1045,30 +1074,51 @@ function g2Next(){
     endScreen(document.getElementById('g2Target'),document.getElementById('g2Opts'),g2Right,G2_TOTAL);
     return;
   }
-  const pool=activePool();
-  g2Target=pool[Math.floor(Math.random()*pool.length)];
-  document.getElementById('g2Target').textContent=g2Target.s;
-  // 從整個 SYMS 池中找與 target 圖案不同的干擾
-  const opts=[g2Target];
-  let tries=0;
-  while(opts.length<4 && tries<200){
-    tries++;
-    const c=SYMS[Math.floor(Math.random()*SYMS.length)];
-    if(!opts.find(o=>o.pic===c.pic))opts.push(c);
-  }
-  opts.sort(()=>Math.random()-0.5);
+  const q=g2GenQ();
+  g2TargetTone=q.tone;
+  g2TargetChar=q.char;
+  // 顯示音節，聲調符號突顯
+  const marks=['','ˊ','ˇ','ˋ'];
+  const mark=marks[q.tone-1];
+  document.getElementById('g2Target').innerHTML=
+    '<span>'+q.syl+'</span>'+
+    (mark?'<span style="color:var(--orange);font-size:1.5em;font-weight:900">'+mark+'</span>'
+         :'<span style="color:#B0BBD0;font-size:0.4em;vertical-align:middle">　(無符號)</span>');
+  // 4 個聲調選項
+  const tones=[
+    {n:1,mk:'─',lbl:'一聲',hint:'平平的'},
+    {n:2,mk:'ˊ',lbl:'二聲',hint:'往上揚'},
+    {n:3,mk:'ˇ',lbl:'三聲',hint:'先下再上'},
+    {n:4,mk:'ˋ',lbl:'四聲',hint:'往下降'}
+  ];
   const box=document.getElementById('g2Opts');box.innerHTML='';
-  opts.forEach(o=>{
-    const b=document.createElement('button');b.className='opt';b.style.fontSize='50px';
-    b.textContent=o.pic;
+  tones.forEach(t=>{
+    const b=document.createElement('button');
+    b.className='opt';
+    b.style.cssText='width:96px;height:104px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0';
+    b.innerHTML='<div style="font-family:var(--kai);font-size:40px;font-weight:900;line-height:1;color:var(--orange-d)">'+t.mk+'</div>'+
+                '<div style="font-size:15px;font-weight:800;margin-top:4px">'+t.lbl+'</div>'+
+                '<div style="font-size:11px;color:#8A97AE">'+t.hint+'</div>';
     b.onclick=()=>{
-      if(o.s===g2Target.s){b.classList.add('good');g2Right++;cheer();setTimeout(g2Next,1100);}
-      else{b.classList.add('bad');gentle();setTimeout(()=>b.classList.remove('bad'),500);}
+      if(t.n===g2TargetTone){
+        b.classList.add('good');g2Right++;cheer();setTimeout(g2Next,1100);
+      } else {
+        b.classList.add('bad');gentle();
+        setTimeout(()=>{b.classList.remove('bad');g2PlayAudio();},500);
+      }
     };
     box.appendChild(b);
   });
+  setTimeout(g2PlayAudio,250);
+}
+function g2PlayAudio(){
+  if(!g2TargetChar)return;
+  const marks=['','ˊ','ˇ','ˋ'];
+  // 用 speakChar 處理三聲特例（會自動重複）
+  speakChar(g2TargetChar,'?'+marks[g2TargetTone-1],0.78);
 }
 document.getElementById('g2Start').onclick=g2Begin;
+document.getElementById('g2Play').onclick=g2PlayAudio;
 
 /* ========== Game 3: 聽一聽（翰林真人發音） ========== */
 const G3_TOTAL=10;
@@ -1189,7 +1239,7 @@ const LDEF=[
         {t:'game',g:'g1',desc:'找出和上面一樣的注音符號！答對 8 題以上就過關 🏁'}]},
  {syms:['ㄢ','ㄣ','ㄤ','ㄥ','ㄦ','ㄧ','ㄨ','ㄩ'],
   post:[{t:'joined',list:['ㄧㄚ','ㄧㄝ','ㄧㄡ','ㄨㄚ','ㄨㄛ','ㄨㄟ','ㄩㄝ','ㄩㄢ'],title:'結合韻初體驗：兩個好朋友手牽手'},
-        {t:'game',g:'g2',desc:'找出每個注音的好朋友圖案！答對 8 題以上就過關 🏁'}]},
+        {t:'game',g:'g2',desc:'找出每個音節的聲調！答對 8 題以上就過關 🏁'}]},
  {syms:['ㄅ','ㄆ','ㄇ','ㄈ','ㄉ','ㄊ','ㄋ','ㄌ'],
   post:[{t:'blend',title:'兩拼小火車：聲母＋韻母，碰在一起變什麼字？',items:[['ㄅㄚ',1],['ㄅㄚ',4],['ㄆㄚ',2],['ㄇㄚ',1],['ㄇㄚ',3],['ㄈㄢ',4],['ㄉㄚ',3],['ㄊㄨ',4],['ㄋㄞ',3],['ㄌㄠ',3]]},
         {t:'game',g:'g3',desc:'聽真人發音，找出對應的注音！答對 8 題以上就過關 🏁'}]},
@@ -1203,7 +1253,7 @@ const LDEF=[
   pre:[{t:'joined',list:null,title:'22 個結合韻總動員（點一點，每個都有故事）'},
        {t:'blend',title:'三拼總練習',items:[['ㄒㄧㄤ',1],['ㄋㄧㄡ',2],['ㄑㄩㄢ',2],['ㄌㄧㄤ',4],['ㄊㄧㄠ',4],['ㄍㄨㄟ',1],['ㄏㄨㄟ',2],['ㄐㄩㄝ',2]]},
        {t:'poem',list:[0,1]}],
-  post:[{t:'game',g:'g2',desc:'找好朋友圖案，總複習！'}]},
+  post:[{t:'game',g:'g2',desc:'聲調總複習，找出每個音節的聲調！'}]},
  {syms:[],
   pre:[{t:'poem',list:[2]},
        {t:'game',g:'g1',desc:'第一關：找一樣的注音，答對 8 題！'},
