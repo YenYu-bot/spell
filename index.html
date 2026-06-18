@@ -1077,13 +1077,11 @@ function g2Next(){
   const q=g2GenQ();
   g2TargetTone=q.tone;
   g2TargetChar=q.char;
-  // 顯示音節，聲調符號突顯
-  const marks=['','ˊ','ˇ','ˋ'];
-  const mark=marks[q.tone-1];
+  // 顯示音節但「藏起」聲調符號，小朋友只能靠聽的
   document.getElementById('g2Target').innerHTML=
+    '<div style="font-size:0.3em;color:#8A97AE;margin-bottom:6px;font-weight:600">🔊 仔細聽，這是幾聲？</div>'+
     '<span>'+q.syl+'</span>'+
-    (mark?'<span style="color:var(--orange);font-size:1.5em;font-weight:900">'+mark+'</span>'
-         :'<span style="color:#B0BBD0;font-size:0.4em;vertical-align:middle">　(無符號)</span>');
+    '<span style="color:#B0BBD0;font-size:0.85em;margin-left:6px">？</span>';
   // 4 個聲調選項
   const tones=[
     {n:1,mk:'─',lbl:'一聲',hint:'平平的'},
