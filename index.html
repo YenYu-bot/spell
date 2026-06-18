@@ -877,15 +877,15 @@ const POEMS=[
    [['蹦','ㄅㄥˋ'],['蹦','ㄅㄥˋ'],['跳','ㄊㄧㄠˋ'],['跳','ㄊㄧㄠˋ'],['吃','ㄔ'],['青','ㄑㄧㄥ'],['菜','ㄘㄞˋ'],['。','']]
  ]},
  {title:'🌧️ 下雨了',lines:[
-   [['滴','ㄉㄧ'],['滴','ㄉㄧ'],['答','ㄉㄚ'],['，','']],
-   [['滴','ㄉㄧ'],['滴','ㄉㄧ'],['答','ㄉㄚ'],['，','']],
+   [['滴','ㄉㄧ'],['滴','ㄉㄧ'],['答','ㄉㄚ','嗒'],['，','']],
+   [['滴','ㄉㄧ'],['滴','ㄉㄧ'],['答','ㄉㄚ','嗒'],['，','']],
    [['下','ㄒㄧㄚˋ'],['雨','ㄩˇ'],['了','˙ㄌㄜ'],['，','']],
    [['我','ㄨㄛˇ'],['撐','ㄔㄥ'],['傘','ㄙㄢˇ'],['，','']],
    [['小','ㄒㄧㄠˇ'],['花','ㄏㄨㄚ'],['小','ㄒㄧㄠˇ'],['草','ㄘㄠˇ'],['笑','ㄒㄧㄠˋ'],['哈','ㄏㄚ'],['哈','ㄏㄚ'],['。','']]
  ]},
  {title:'🎒 上學去',lines:[
    [['太','ㄊㄞˋ'],['陽','ㄧㄤˊ'],['公','ㄍㄨㄥ'],['公','ㄍㄨㄥ'],['起','ㄑㄧˇ'],['得','˙ㄉㄜ'],['早','ㄗㄠˇ'],['，','']],
-   [['背','ㄅㄟ'],['起','ㄑㄧˇ'],['書','ㄕㄨ'],['包','ㄅㄠ'],['上','ㄕㄤˋ'],['學','ㄒㄩㄝˊ'],['校','ㄒㄧㄠˋ'],['，','']],
+   [['背','ㄅㄟ','揹'],['起','ㄑㄧˇ'],['書','ㄕㄨ'],['包','ㄅㄠ'],['上','ㄕㄤˋ'],['學','ㄒㄩㄝˊ'],['校','ㄒㄧㄠˋ'],['，','']],
    [['見','ㄐㄧㄢˋ'],['到','ㄉㄠˋ'],['老','ㄌㄠˇ'],['師','ㄕ'],['說','ㄕㄨㄛ'],['聲','ㄕㄥ'],['好','ㄏㄠˇ'],['，','']],
    [['快','ㄎㄨㄞˋ'],['快','ㄎㄨㄞˋ'],['樂','ㄌㄜˋ'],['樂','ㄌㄜˋ'],['學','ㄒㄩㄝˊ'],['注','ㄓㄨˋ'],['音','ㄧㄣ'],['。','']]
  ]}
@@ -901,18 +901,18 @@ function buildPoemCard(pi){
   card.appendChild(head);
   p.lines.forEach(line=>{
     const lp2=document.createElement('div');lp2.className='pline';
-    line.forEach(([hz,zy])=>{
+    line.forEach(([hz,zy,tts])=>{
       const sy=document.createElement('div');sy.className='syl';
       if(!zy){sy.style.cursor='default';sy.style.background='transparent';sy.innerHTML='<div class="zy">&nbsp;</div><div class="hz">'+hz+'</div>';}
       else{
         sy.innerHTML='<div class="zy">'+zy+'</div><div class="hz">'+hz+'</div>';
-        sy.onclick=()=>{speakChar(hz,zy,0.78);sy.classList.add('lit');setTimeout(()=>sy.classList.remove('lit'),600);};
+        sy.onclick=()=>{speakChar(tts||hz,zy,0.78);sy.classList.add('lit');setTimeout(()=>sy.classList.remove('lit'),600);};
       }
       lp2.appendChild(sy);
     });
     const lb=document.createElement('button');lb.className='btn w';lb.style.alignSelf='center';lb.style.fontSize='13px';lb.style.padding='6px 10px';lb.textContent='🔊';
     lb.title='唸這一句';
-    lb.onclick=()=>speak(line.map(x=>x[0]).join(''),0.7);
+    lb.onclick=()=>speak(line.map(x=>x[2]||x[0]).join(''),0.7);
     lp2.appendChild(lb);
     card.appendChild(lp2);
   });
@@ -923,7 +923,7 @@ function buildPoemCard(pi){
   POEMS.forEach((p,pi)=>box.appendChild(buildPoemCard(pi)));
 })();
 function playPoem(pi){
-  const text=POEMS[pi].lines.map(l=>l.map(x=>x[0]).join('')).join('，');
+  const text=POEMS[pi].lines.map(l=>l.map(x=>x[2]||x[0]).join('')).join('，');
   speak(text,0.72);
 }
 
