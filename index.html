@@ -1897,15 +1897,16 @@ const RHYME_GROUPS={
   U: ['ㄨㄚ','ㄨㄛ','ㄨㄞ','ㄨㄟ','ㄨㄢ','ㄨㄣ','ㄨㄤ','ㄨㄥ'],
   YY:['ㄩㄝ','ㄩㄢ','ㄩㄣ','ㄩㄥ','ㄦ']
 };
-// 自動推算結合韻對應例字的聲調（讓顯示和發音一致）
+// 結合韻例字的聲調對照表（依 JINFO 例字寫死，比靠 lookup 穩）
 const TONE_MARKS=['','ˊ','ˇ','ˋ'];
+const RHYME_TONE={
+  'ㄧㄚ':1,'ㄧㄛ':1,'ㄧㄝ':1,'ㄧㄠ':1,'ㄧㄡ':2,'ㄧㄢ':1,'ㄧㄣ':1,'ㄧㄤ':2,'ㄧㄥ':1,
+  'ㄨㄚ':1,'ㄨㄛ':1,'ㄨㄞ':1,'ㄨㄟ':4,'ㄨㄢ':3,'ㄨㄣ':1,'ㄨㄤ':1,'ㄨㄥ':1,
+  'ㄩㄝ':4,'ㄩㄢ':2,'ㄩㄣ':2,'ㄩㄥ':3,'ㄦ':3
+};
 function rhymeWithTone(j){
-  const info=JINFO[j];if(!info)return j;
-  const ex=info[1];
-  for(let t=1;t<=4;t++){
-    if(lookup(j,t)===ex)return j+TONE_MARKS[t-1];
-  }
-  return j;
+  const t=RHYME_TONE[j]||1;
+  return t===1?j:j+TONE_MARKS[t-1];
 }
 function buildRhymeGrid(containerId,list){
   const box=document.getElementById(containerId);
