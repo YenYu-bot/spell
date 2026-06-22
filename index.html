@@ -64,6 +64,41 @@ h2.sec{font-size:22px;margin:14px 4px 10px;display:flex;align-items:center;gap:8
   body{font-size:11pt}
   .sec{font-size:13pt}
 }
+/* === 進階學習頁 === */
+.adv-tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.adv-tab{background:#fff;border:2px solid #B0BBD0;color:#5A6678;padding:8px 18px;border-radius:14px;font-weight:900;cursor:pointer;font-size:15px}
+.adv-tab.on{background:linear-gradient(135deg,#FFD700,#FF8A3D);color:#fff;border-color:transparent;box-shadow:0 3px 0 #C28A2D}
+.adv-content{display:none}
+.adv-content.on{display:block}
+.rhyme-family-title{margin:18px 0 8px;font-size:17px;padding:6px 14px;border-radius:10px;display:inline-block}
+.rhyme-family-title.fam-i{background:#D6E8FF;color:#1E4D8C}
+.rhyme-family-title.fam-u{background:#D6F5D6;color:#1F7A1F}
+.rhyme-family-title.fam-yu{background:#EAD6FF;color:#5D2E8C}
+.rhyme-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;margin-bottom:10px}
+.rhyme-cell{background:#fff;border:2px solid #E0E5EE;border-radius:14px;padding:12px 8px;text-align:center;cursor:pointer;transition:all .15s;box-shadow:0 2px 0 #ddd}
+.rhyme-cell:hover{transform:translateY(-2px);box-shadow:0 4px 0 #ccc;border-color:#FFB347}
+.rhyme-cell.active{background:linear-gradient(135deg,#FFE5B4,#FFC4C4);border-color:#FF6F61;animation:pulse .4s}
+.rhyme-cell .rc-sym{font-family:var(--kai);font-size:26px;font-weight:900;color:#000;line-height:1}
+.rhyme-cell .rc-emoji{font-size:24px;margin:4px 0}
+.rhyme-cell .rc-word{font-size:13px;color:#666;font-weight:700}
+@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.08)}100%{transform:scale(1)}}
+.round-info{font-size:14px;font-weight:800;color:#5A6678}
+.quiz-prompt{font-size:15px;font-weight:800;margin-bottom:10px;color:#444;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+
+/* === 多音字 === */
+#polyList{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-top:14px}
+.poly-card{background:#fff;border:3px solid #FFD580;border-radius:18px;padding:16px;box-shadow:0 4px 0 #E8C9A0}
+.poly-char{font-family:var(--kai);font-size:54px;font-weight:900;text-align:center;line-height:1;margin-bottom:8px;color:#5C3A0F}
+.poly-readings{display:flex;flex-direction:column;gap:10px}
+.poly-reading{background:#FFFCF0;border-radius:10px;padding:8px 12px}
+.poly-zy{font-family:var(--kai);font-size:20px;font-weight:900;color:#D74D2D;display:inline-block;margin-right:8px}
+.poly-meaning{font-size:13px;color:#666;font-weight:700;display:inline-block}
+.poly-examples{margin-top:6px;display:flex;flex-wrap:wrap;gap:5px}
+.poly-ex{background:#fff;border:1.5px solid #FFB347;border-radius:8px;padding:4px 10px;font-size:14px;font-weight:800;color:#5C3A0F;cursor:pointer;transition:all .15s}
+.poly-ex:hover{background:#FFB347;color:#fff}
+.poly-ex .ex-zy{font-family:var(--kai);font-size:11px;color:#999;margin-left:4px;font-weight:600}
+.poly-ex:hover .ex-zy{color:rgba(255,255,255,.85)}
+
 /* === Batch 3: 自選符號池 === */
 .progBtn.custom{background:linear-gradient(135deg,#FF8A65,#FFB347);color:#fff}
 .progBtn.custom.on{background:linear-gradient(135deg,#FF6F61,#FF8A3D);box-shadow:0 3px 0 #C44}
@@ -326,6 +361,7 @@ footer{text-align:center;font-size:12px;color:#8A97AE;padding:20px}
   <button class="tab" data-pg="spell">🚂 拼拼看</button>
   <button class="tab" data-pg="poem">📖 唸課文</button>
   <button class="tab" data-pg="game">🎮 玩遊戲</button>
+  <button class="tab" data-pg="advanced">🎓 進階</button>
 </nav>
 
 <main>
@@ -490,6 +526,50 @@ footer{text-align:center;font-size:12px;color:#8A97AE;padding:20px}
 </section>
 </main>
 
+<!-- ================= 進階學習 ================= -->
+<section id="pg-advanced" class="page">
+  <h2 class="sec">🎓 進階學習</h2>
+  
+  <div class="adv-tabs">
+    <button class="adv-tab on" data-adv="rhyme">🌈 結合韻練習</button>
+    <button class="adv-tab" data-adv="poly">🎭 多音字小教室</button>
+  </div>
+  
+  <!-- ========== 結合韻 ========== -->
+  <div id="adv-rhyme" class="adv-content on">
+    <div class="card" style="background:linear-gradient(135deg,#E6F3FF,#FFF0E8)">
+      <div style="font-weight:900;font-size:16px;margin-bottom:4px">什麼是「結合韻」？</div>
+      <div style="font-size:14px;line-height:1.7">把介音 ㄧ／ㄨ／ㄩ 跟韻符結合起來，就能拼出更多字音。例如：ㄧ＋ㄚ＝ㄧㄚ（鴨子的鴨）。<br>共有 22 個結合韻，分成三個家族 👇 點任何一個聽發音、看故事。</div>
+    </div>
+
+    <h3 class="rhyme-family-title fam-i">🟦 ㄧ 介音家族</h3>
+    <div class="rhyme-grid" id="rhymeI"></div>
+
+    <h3 class="rhyme-family-title fam-u">🟩 ㄨ 介音家族</h3>
+    <div class="rhyme-grid" id="rhymeU"></div>
+
+    <h3 class="rhyme-family-title fam-yu">🟪 ㄩ 介音家族（＋ ㄦ 捲舌韻）</h3>
+    <div class="rhyme-grid" id="rhymeYY"></div>
+
+    <div class="card" style="margin-top:18px;background:linear-gradient(135deg,#FFF7C8,#FFCFCF)">
+      <h3 style="margin:0 0 8px">🎮 結合韻聽力測驗</h3>
+      <div style="font-size:14px;color:#555;margin-bottom:10px">仔細聽發音，從 4 個結合韻中選出正確的。共 10 題。</div>
+      <div class="round-info">第 <span id="rqRound">0</span> / 10 題 · 答對 <span id="rqRight">0</span> 題</div>
+      <div id="rqArea" style="margin-top:10px"></div>
+      <button class="btn t" id="rqStart" style="margin-top:10px">▶ 開始測驗</button>
+    </div>
+  </div>
+  
+  <!-- ========== 多音字 ========== -->
+  <div id="adv-poly" class="adv-content">
+    <div class="card" style="background:linear-gradient(135deg,#FFE8E8,#FFF5E0)">
+      <div style="font-weight:900;font-size:16px;margin-bottom:4px">什麼是「多音字」？</div>
+      <div style="font-size:14px;line-height:1.7">有些國字「長得一樣，唸法不同」，依用法選對的音很重要喔。<br>下面是國小最常見的 10 個多音字，每個字點例詞可以聽發音 🔊</div>
+    </div>
+    <div id="polyList"></div>
+  </div>
+</section>
+
 <!-- 符號詳細視窗 -->
 <div class="modal" id="modal">
   <div class="mbox">
@@ -653,10 +733,10 @@ document.addEventListener('keydown',e=>{
   if(v && v.classList.contains('on') && e.key==='Escape'){const btn=document.getElementById('vClose');if(btn)btn.click();e.preventDefault();return;}
   const c=document.getElementById('cert');
   if(c && c.classList.contains('on') && e.key==='Escape'){c.classList.remove('on');e.preventDefault();return;}
-  if(/^[1-5]$/.test(e.key) && !e.ctrlKey && !e.metaKey && !e.altKey){
+  if(/^[1-6]$/.test(e.key) && !e.ctrlKey && !e.metaKey && !e.altKey){
     const tag=(e.target&&e.target.tagName)||'';
     if(tag==='INPUT'||tag==='TEXTAREA')return;
-    const pgs=['plan','learn','spell','poem','game'];
+    const pgs=['plan','learn','spell','poem','game','advanced'];
     const tab=document.querySelector('.tab[data-pg="'+pgs[parseInt(e.key)-1]+'"]');
     if(tab)tab.click();
   }
@@ -1799,6 +1879,156 @@ function renderStep(){
   m.addEventListener('click',e=>{if(e.target===m)closeV();});
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&m.classList.contains('on'))closeV();});
 })();
+
+/* ============ 進階分頁切換 ============ */
+document.querySelectorAll('.adv-tab').forEach(b=>{
+  b.onclick=()=>{
+    document.querySelectorAll('.adv-tab').forEach(x=>x.classList.toggle('on',x===b));
+    const which=b.dataset.adv;
+    document.getElementById('adv-rhyme').classList.toggle('on',which==='rhyme');
+    document.getElementById('adv-poly').classList.toggle('on',which==='poly');
+    sfxClick();
+  };
+});
+
+/* ============ 結合韻分組渲染 ============ */
+const RHYME_GROUPS={
+  I: ['ㄧㄚ','ㄧㄛ','ㄧㄝ','ㄧㄠ','ㄧㄡ','ㄧㄢ','ㄧㄣ','ㄧㄤ','ㄧㄥ'],
+  U: ['ㄨㄚ','ㄨㄛ','ㄨㄞ','ㄨㄟ','ㄨㄢ','ㄨㄣ','ㄨㄤ','ㄨㄥ'],
+  YY:['ㄩㄝ','ㄩㄢ','ㄩㄣ','ㄩㄥ','ㄦ']
+};
+function buildRhymeGrid(containerId,list){
+  const box=document.getElementById(containerId);
+  box.innerHTML='';
+  list.forEach(j=>{
+    const info=JINFO[j];if(!info)return;
+    const c=document.createElement('div');c.className='rhyme-cell';
+    c.innerHTML='<div class="rc-sym">'+j+'</div>'+
+                '<div class="rc-emoji">'+info[0]+'</div>'+
+                '<div class="rc-word">'+info[1]+'</div>';
+    c.onclick=()=>{
+      c.classList.add('active');setTimeout(()=>c.classList.remove('active'),400);
+      speakJoined(j);
+    };
+    box.appendChild(c);
+  });
+}
+buildRhymeGrid('rhymeI', RHYME_GROUPS.I);
+buildRhymeGrid('rhymeU', RHYME_GROUPS.U);
+buildRhymeGrid('rhymeYY',RHYME_GROUPS.YY);
+
+/* ============ 結合韻聽力測驗 ============ */
+const RQ_TOTAL=10;
+let rqRound=0,rqRight=0,rqTarget=null;
+function rqBegin(){
+  rqRound=0;rqRight=0;
+  document.getElementById('rqStart').textContent='重新測驗';
+  rqNext();
+}
+function rqNext(){
+  rqRound++;
+  document.getElementById('rqRound').textContent=Math.min(rqRound,RQ_TOTAL);
+  document.getElementById('rqRight').textContent=rqRight;
+  if(rqRound>RQ_TOTAL){
+    const msg=rqRight>=8?'好厲害！耳朵超靈 🎉':rqRight>=5?'不錯喔，再多聽幾次就更熟！':'多玩幾次，耳朵會越來越靈！';
+    document.getElementById('rqArea').innerHTML='<div class="endMsg">'+RQ_TOTAL+' 題答對 <b>'+rqRight+'</b> 題！<br>'+msg+'</div>';
+    return;
+  }
+  rqTarget=JOINED[Math.floor(Math.random()*JOINED.length)];
+  const others=JOINED.filter(j=>j!==rqTarget).slice();
+  // shuffle
+  for(let i=others.length-1;i>0;i--){const k=Math.floor(Math.random()*(i+1));[others[i],others[k]]=[others[k],others[i]];}
+  const opts=[rqTarget,others[0],others[1],others[2]];
+  for(let i=opts.length-1;i>0;i--){const k=Math.floor(Math.random()*(i+1));[opts[i],opts[k]]=[opts[k],opts[i]];}
+  
+  const area=document.getElementById('rqArea');
+  area.innerHTML='<div class="quiz-prompt">🔊 聽聽看，這是哪個結合韻？ <button class="btn t" onclick="speakJoined(rqTarget)" style="font-size:13px;padding:5px 12px">🔊 再聽一次</button></div>';
+  const ob=document.createElement('div');ob.className='opts';
+  opts.forEach(j=>{
+    const b=document.createElement('button');b.className='opt';b.style.fontSize='28px';b.style.fontFamily='var(--kai)';
+    b.textContent=j;
+    b.onclick=()=>{
+      if(j===rqTarget){sfxRight();b.classList.add('good');rqRight++;cheer();setTimeout(rqNext,1100);}
+      else{sfxWrong();b.classList.add('bad');gentle();setTimeout(()=>{b.classList.remove('bad');speakJoined(rqTarget);},500);}
+    };
+    ob.appendChild(b);
+  });
+  area.appendChild(ob);
+  setTimeout(()=>speakJoined(rqTarget),300);
+}
+document.getElementById('rqStart').onclick=rqBegin;
+
+/* ============ 多音字資料 ============ */
+const POLY=[
+  {c:'為',rs:[
+    {z:'ㄨㄟˊ',m:'動詞「做、當」',ex:[['作為','ㄗㄨㄛˋ ㄨㄟˊ'],['行為','ㄒㄧㄥˊ ㄨㄟˊ'],['以為','ㄧˇ ㄨㄟˊ']]},
+    {z:'ㄨㄟˋ',m:'介詞「替、給」',ex:[['為了','ㄨㄟˋ ㄌㄜ˙'],['為什麼','ㄨㄟˋ ㄕㄣˊ ㄇㄜ˙'],['為你','ㄨㄟˋ ㄋㄧˇ']]}
+  ]},
+  {c:'著',rs:[
+    {z:'˙ㄓㄜ',m:'語尾，表持續',ex:[['坐著','ㄗㄨㄛˋ ㄓㄜ˙'],['跟著','ㄍㄣ ㄓㄜ˙'],['想著','ㄒㄧㄤˇ ㄓㄜ˙']]},
+    {z:'ㄓㄠˊ',m:'感受到、被影響',ex:[['著急','ㄓㄠˊ ㄐㄧˊ'],['著火','ㄓㄠˊ ㄏㄨㄛˇ'],['睡著','ㄕㄨㄟˋ ㄓㄠˊ']]},
+    {z:'ㄓㄨㄛˊ',m:'穿、附著',ex:[['穿著','ㄔㄨㄢ ㄓㄨㄛˊ'],['著作','ㄓㄨㄛˊ ㄗㄨㄛˋ']]}
+  ]},
+  {c:'行',rs:[
+    {z:'ㄒㄧㄥˊ',m:'走、可以',ex:[['行人','ㄒㄧㄥˊ ㄖㄣˊ'],['行走','ㄒㄧㄥˊ ㄗㄡˇ'],['可行','ㄎㄜˇ ㄒㄧㄥˊ']]},
+    {z:'ㄏㄤˊ',m:'機構、排列',ex:[['銀行','ㄧㄣˊ ㄏㄤˊ'],['行業','ㄏㄤˊ ㄧㄝˋ'],['一行','ㄧˋ ㄏㄤˊ']]}
+  ]},
+  {c:'了',rs:[
+    {z:'˙ㄌㄜ',m:'語助詞',ex:[['吃了','ㄔ ㄌㄜ˙'],['走了','ㄗㄡˇ ㄌㄜ˙'],['好了','ㄏㄠˇ ㄌㄜ˙']]},
+    {z:'ㄌㄧㄠˇ',m:'明白、結束',ex:[['了解','ㄌㄧㄠˇ ㄐㄧㄝˇ'],['了結','ㄌㄧㄠˇ ㄐㄧㄝˊ']]}
+  ]},
+  {c:'樂',rs:[
+    {z:'ㄌㄜˋ',m:'快樂、開心',ex:[['快樂','ㄎㄨㄞˋ ㄌㄜˋ'],['歡樂','ㄏㄨㄢ ㄌㄜˋ'],['樂趣','ㄌㄜˋ ㄑㄩˋ']]},
+    {z:'ㄩㄝˋ',m:'音樂',ex:[['音樂','ㄧㄣ ㄩㄝˋ'],['樂器','ㄩㄝˋ ㄑㄧˋ'],['樂團','ㄩㄝˋ ㄊㄨㄢˊ']]}
+  ]},
+  {c:'重',rs:[
+    {z:'ㄓㄨㄥˋ',m:'重量、重要',ex:[['重量','ㄓㄨㄥˋ ㄌㄧㄤˋ'],['嚴重','ㄧㄢˊ ㄓㄨㄥˋ'],['重要','ㄓㄨㄥˋ ㄧㄠˋ']]},
+    {z:'ㄔㄨㄥˊ',m:'再一次',ex:[['重複','ㄔㄨㄥˊ ㄈㄨˋ'],['重新','ㄔㄨㄥˊ ㄒㄧㄣ'],['重來','ㄔㄨㄥˊ ㄌㄞˊ']]}
+  ]},
+  {c:'長',rs:[
+    {z:'ㄔㄤˊ',m:'長度長',ex:[['很長','ㄏㄣˇ ㄔㄤˊ'],['長江','ㄔㄤˊ ㄐㄧㄤ'],['長度','ㄔㄤˊ ㄉㄨˋ']]},
+    {z:'ㄓㄤˇ',m:'生長、首領',ex:[['長大','ㄓㄤˇ ㄉㄚˋ'],['校長','ㄒㄧㄠˋ ㄓㄤˇ'],['成長','ㄔㄥˊ ㄓㄤˇ']]}
+  ]},
+  {c:'還',rs:[
+    {z:'ㄏㄞˊ',m:'仍然、再加上',ex:[['還沒','ㄏㄞˊ ㄇㄟˊ'],['還在','ㄏㄞˊ ㄗㄞˋ'],['還有','ㄏㄞˊ ㄧㄡˇ']]},
+    {z:'ㄏㄨㄢˊ',m:'歸還',ex:[['還錢','ㄏㄨㄢˊ ㄑㄧㄢˊ'],['還書','ㄏㄨㄢˊ ㄕㄨ'],['償還','ㄔㄤˊ ㄏㄨㄢˊ']]}
+  ]},
+  {c:'都',rs:[
+    {z:'ㄉㄡ',m:'全部、皆',ex:[['都是','ㄉㄡ ㄕˋ'],['都好','ㄉㄡ ㄏㄠˇ'],['都會','ㄉㄡ ㄏㄨㄟˋ']]},
+    {z:'ㄉㄨ',m:'首都、大城市',ex:[['首都','ㄕㄡˇ ㄉㄨ'],['京都','ㄐㄧㄥ ㄉㄨ'],['成都','ㄔㄥˊ ㄉㄨ']]}
+  ]},
+  {c:'給',rs:[
+    {z:'ㄍㄟˇ',m:'交付、送出',ex:[['給我','ㄍㄟˇ ㄨㄛˇ'],['送給','ㄙㄨㄥˋ ㄍㄟˇ'],['給你','ㄍㄟˇ ㄋㄧˇ']]},
+    {z:'ㄐㄧˇ',m:'供應',ex:[['補給','ㄅㄨˇ ㄐㄧˇ'],['供給','ㄍㄨㄥ ㄐㄧˇ'],['配給','ㄆㄟˋ ㄐㄧˇ']]}
+  ]}
+];
+function renderPoly(){
+  const box=document.getElementById('polyList');box.innerHTML='';
+  POLY.forEach(p=>{
+    const card=document.createElement('div');card.className='poly-card';
+    let html='<div class="poly-char">'+p.c+'</div><div class="poly-readings">';
+    p.rs.forEach(r=>{
+      html+='<div class="poly-reading"><span class="poly-zy">'+r.z+'</span><span class="poly-meaning">'+r.m+'</span><div class="poly-examples">';
+      r.ex.forEach(([word,zy])=>{
+        html+='<button class="poly-ex" data-word="'+word+'">'+word+'<span class="ex-zy">'+zy+'</span></button>';
+      });
+      html+='</div></div>';
+    });
+    html+='</div>';
+    card.innerHTML=html;
+    box.appendChild(card);
+  });
+  // 綁定例詞點擊
+  box.querySelectorAll('.poly-ex').forEach(btn=>{
+    btn.onclick=()=>{
+      const w=btn.dataset.word;
+      btn.style.background='#FFB347';btn.style.color='#fff';
+      speak(w,0.7);
+      setTimeout(()=>{btn.style.background='';btn.style.color='';},500);
+    };
+  });
+}
+renderPoly();
 
 // 所有函式定義完後，渲染七堂課首頁
 renderPlan();
