@@ -1897,13 +1897,23 @@ const RHYME_GROUPS={
   U: ['ㄨㄚ','ㄨㄛ','ㄨㄞ','ㄨㄟ','ㄨㄢ','ㄨㄣ','ㄨㄤ','ㄨㄥ'],
   YY:['ㄩㄝ','ㄩㄢ','ㄩㄣ','ㄩㄥ','ㄦ']
 };
+// 自動推算結合韻對應例字的聲調（讓顯示和發音一致）
+const TONE_MARKS=['','ˊ','ˇ','ˋ'];
+function rhymeWithTone(j){
+  const info=JINFO[j];if(!info)return j;
+  const ex=info[1];
+  for(let t=1;t<=4;t++){
+    if(lookup(j,t)===ex)return j+TONE_MARKS[t-1];
+  }
+  return j;
+}
 function buildRhymeGrid(containerId,list){
   const box=document.getElementById(containerId);
   box.innerHTML='';
   list.forEach(j=>{
     const info=JINFO[j];if(!info)return;
     const c=document.createElement('div');c.className='rhyme-cell';
-    c.innerHTML='<div class="rc-sym">'+j+'</div>'+
+    c.innerHTML='<div class="rc-sym">'+rhymeWithTone(j)+'</div>'+
                 '<div class="rc-emoji">'+info[0]+'</div>'+
                 '<div class="rc-word">'+info[1]+'</div>';
     c.onclick=()=>{
@@ -1946,7 +1956,7 @@ function rqNext(){
   const ob=document.createElement('div');ob.className='opts';
   opts.forEach(j=>{
     const b=document.createElement('button');b.className='opt';b.style.fontSize='28px';b.style.fontFamily='var(--kai)';
-    b.textContent=j;
+    b.textContent=rhymeWithTone(j);
     b.onclick=()=>{
       if(j===rqTarget){sfxRight();b.classList.add('good');rqRight++;cheer();setTimeout(rqNext,1100);}
       else{sfxWrong();b.classList.add('bad');gentle();setTimeout(()=>{b.classList.remove('bad');speakJoined(rqTarget);},500);}
