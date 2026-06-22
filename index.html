@@ -1582,8 +1582,8 @@ function g2Next(){
 }
 function g2PlayAudio(){
   if(!g2TargetChar)return;
-  // 唸兩次，中間加逗號讓 TTS 自然停頓；速度放慢，讓 3 聲的下↘上↗曲線聽得清楚
-  speak(g2TargetChar+'，'+g2TargetChar, 0.55);
+  // 速度放慢給孩子聽清楚聲調曲線
+  speak(g2TargetChar, 0.55);
 }
 document.getElementById('g2Start').onclick=g2Begin;
 document.getElementById('g2Play').onclick=g2PlayAudio;
