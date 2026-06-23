@@ -1583,7 +1583,7 @@ function g2Next(){
 function g2PlayAudio(){
   if(!g2TargetChar)return;
   // 3 聲（下↘上↗）曲線需要更多時間才聽得清楚，所以放更慢
-  const rate = g2TargetTone===3 ? 0.4 : 0.6;
+  const rate = g2TargetTone===3 ? 0.3 : 0.6;
   speak(g2TargetChar, rate);
 }
 document.getElementById('g2Start').onclick=g2Begin;
